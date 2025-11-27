@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Leapstart Game Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Top bar -->
+    <header class="header">
+      <div class="brand">
+        <h1>LeapStart PlayHub</h1>
+        <p class="subtitle">Book Foosball · Carrom · Table Tennis &mdash; 9:00 AM – 5:30 PM</p>
+      </div>
+      <div class="school-tag">
+        LeapStart School of Technology
+      </div>
+    </header>
+
+    <!-- Game selection row -->
+    <section class="games-row">
+      <div class="games-label">
+        Today’s games
+      </div>
+      <div class="games-list">
+        <button class="game-card active" data-game="Foosball">
+          <span class="game-title">Foosball</span>
+          <span class="game-subtitle">2v2 · quick fun</span>
+        </button>
+        <button class="game-card" data-game="Carrom">
+          <span class="game-title">Carrom</span>
+          <span class="game-subtitle">chill &amp; precision</span>
+        </button>
+        <button class="game-card" data-game="Table Tennis">
+          <span class="game-title">Table Tennis</span>
+          <span class="game-subtitle">fast rallies</span>
+        </button>
+      </div>
+      <div class="games-date">
+        <label for="date-input">Date</label>
+        <input id="date-input" type="date" />
+      </div>
+    </section>
+
+    <!-- Main content -->
+    <main class="main">
+      <!-- Left: schedule -->
+      <section class="panel schedule-panel">
+        <div class="schedule-header">
+          <div>
+            <h2>Day Schedule</h2>
+            <p class="hint">
+              Click an available slot to pre‑select it for booking.
+            </p>
+          </div>
+          <div class="selected-info">
+            <div id="selected-game-label" class="pill-label"></div>
+            <div id="selected-date-label" class="pill-label soft"></div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span class="pill available-pill"></span> Available
+          <span class="pill booked-pill"></span> Booked
+          <span class="pill mine-pill"></span> Your booking
+        </div>
+
+        <div id="slot-grid" class="slot-grid">
+          <!-- filled by JS -->
+        </div>
+      </section>
+
+      <!-- Right: booking + my bookings -->
+      <section class="panel booking-panel">
+        <div class="booking-header">
+          <h2>Book a Slot</h2>
+          <p class="hint">
+            Fill your details once. Pick game &amp; time, then lock your slot.
+          </p>
+        </div>
+
+        <form id="booking-form">
+          <div class="form-row two-col">
+            <div class="field">
+              <label for="student-name">Name</label>
+              <input id="student-name" type="text" placeholder="Your full name" required>
+            </div>
+            <div class="field">
+              <label for="student-id">Student ID (optional)</label>
+              <input id="student-id" type="text" placeholder="e.g. LST2025-001">
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div class="field">
+              <label for="game-select">Game</label>
+              <select id="game-select" required>
+                <option value="Foosball">Foosball</option>
+                <option value="Carrom">Carrom</option>
+                <option value="Table Tennis">Table Tennis</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="slot-select">Time Slot</label>
+              <select id="slot-select" required></select>
+              <p class="hint small" id="slot-hint">
+                Tip: click a slot on the left to auto‑select it.
+              </p>
+            </div>
+          </div>
+
+          <div id="form-message" class="form-message"></div>
+
+          <button type="submit" class="primary-btn">Book this slot</button>
+        </form>
+
+        <section class="my-bookings">
+          <h3>My Bookings (this browser)</h3>
+          <ul id="my-bookings-list"></ul>
+          <p class="hint small">
+            Bookings are stored only in this browser (demo / portfolio). For a real campus system
+            we’d plug this UI into a shared backend + database.
+          </p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
