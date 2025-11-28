@@ -1,0 +1,707 @@
+/* Elegant dark theme with gold accents */
+:root {
+  color-scheme: dark;
+  --bg-deep: #000000;
+  --bg: #0a0a0a;
+  --bg-alt: #121212;
+  --panel: #1a1a1a;
+  --panel-alt: #1f1f1f;
+  --panel-hover: #252525;
+  --border: #2a2a2a;
+  --border-light: #3a3a3a;
+  --text: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #707070;
+  --accent-gold: #d4af37;
+  --accent-gold-light: #f4d03f;
+  --accent-gold-dark: #b8941f;
+  --accent-gold-glow: rgba(212, 175, 55, 0.3);
+  --gradient-gold: linear-gradient(135deg, #f4d03f 0%, #d4af37 50%, #b8941f 100%);
+  --gradient-panel: linear-gradient(145deg, #1a1a1a, #141414);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.6);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.8);
+  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #000000;
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  padding: 30px;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* App shell */
+.app {
+  width: 100%;
+  max-width: 1300px;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 120px;
+  height: 2px;
+  background: var(--gradient-gold);
+  border-radius: 2px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.school-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-gold);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 999px;
+}
+
+.school-tag::before {
+  content: '★';
+  font-size: 14px;
+  color: var(--accent-gold);
+}
+
+/* Games row */
+.games-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+  background: var(--gradient-panel);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.games-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+}
+
+.games-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.game-card {
+  flex: 0 0 auto;
+  min-width: 140px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-gold);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.game-card:hover {
+  border-color: var(--border-light);
+  background: var(--panel-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.game-card:hover::before {
+  transform: scaleX(1);
+}
+
+.game-card .game-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.game-card .game-subtitle {
+  display: block;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.game-card.active {
+  border-color: var(--accent-gold);
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+.game-card.active::before {
+  transform: scaleX(1);
+}
+
+.game-card.active .game-title {
+  color: var(--accent-gold-light);
+}
+
+.game-card.active .game-subtitle {
+  color: var(--text-secondary);
+}
+
+.games-date {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.games-date label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.games-date input[type="date"] {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.games-date input[type="date"]:hover {
+  border-color: var(--border-light);
+}
+
+.games-date input[type="date"]:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+/* Main layout */
+.main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.panel {
+  border-radius: 20px;
+  background: var(--gradient-panel);
+  border: 1px solid var(--border);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  transition: border-color 0.3s ease;
+}
+
+.panel:hover {
+  border-color: var(--border-light);
+}
+
+/* Schedule */
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.selected-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.pill-label {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+}
+
+.pill-label.soft {
+  color: var(--text-secondary);
+}
+
+/* Legend */
+.legend {
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  width: 16px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.available-pill {
+  background: var(--panel);
+  border: 1.5px dashed var(--border-light);
+}
+
+.booked-pill {
+  background: #505050;
+}
+
+.mine-pill {
+  background: var(--gradient-gold);
+  box-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+/* Slot grid */
+.slot-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.slot-card {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: default;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.slot-time {
+  font-family: "SF Mono", Menlo, ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.slot-status {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.slot-card.available {
+  border-style: dashed;
+  border-color: var(--border-light);
+  cursor: pointer;
+}
+
+.slot-card.available:hover {
+  border-color: var(--accent-gold);
+  border-style: solid;
+  background: rgba(212, 175, 55, 0.08);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.slot-card.booked {
+  background: rgba(80, 80, 80, 0.15);
+  border-color: #404040;
+  opacity: 0.6;
+}
+
+.slot-card.mine {
+  border-color: var(--accent-gold);
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.2);
+}
+
+.slot-card.mine .slot-status {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+/* Booking panel */
+.booking-header h2 {
+  margin: 0 0 6px;
+}
+
+.booking-header .hint {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.form-row.two-col {
+  flex-direction: row;
+  gap: 12px;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+input,
+select {
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+input:hover,
+select:hover {
+  border-color: var(--border-light);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent-gold);
+  background: var(--panel-alt);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.primary-btn {
+  margin-top: 8px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: var(--gradient-gold);
+  color: #000000;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.primary-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+.primary-btn:hover::before {
+  left: 100%;
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.form-message {
+  min-height: 18px;
+  font-size: 13px;
+  color: #ff6b6b;
+  font-weight: 500;
+}
+
+/* My bookings */
+.my-bookings {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.my-bookings h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+#my-bookings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+
+#my-bookings-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#my-bookings-list::-webkit-scrollbar-track {
+  background: var(--panel);
+  border-radius: 10px;
+}
+
+#my-bookings-list::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 10px;
+}
+
+#my-bookings-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+.my-bookings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.my-bookings-item:hover {
+  background: var(--panel-hover);
+  border-color: var(--border-light);
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--accent-gold);
+}
+
+.cancel-btn {
+  border: none;
+  background: transparent;
+  color: #ff6b6b;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 107, 107, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+  
+  .app {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 16px;
+  }
+  
+  .app {
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+  }
+  
+  .games-row {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  
+  .games-list {
+    gap: 10px;
+  }
+  
+  .game-card {
+    min-width: 120px;
+    padding: 10px 14px;
+  }
+  
+  .slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .form-row.two-col {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+  
+  .app {
+    padding: 16px;
+    border-radius: 16px;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header h1 {
+    font-size: 20px;
+  }
+  
+  .games-row {
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .slot-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .panel {
+    padding: 16px;
+  }
+}
