@@ -2,19 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LeapStart Game Planner</title>
+  <title>Leapstart PlayHub – Game Planner</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <div class="app">
+  <!-- Login screen -->
+  <div id="login-shell" class="login-shell">
+    <div class="login-card">
+      <h1>Leapstart PlayHub</h1>
+      <p class="subtitle">Book Foosball, Carrom &amp; Table Tennis slots on campus.</p>
+      <p class="hint center">
+        Sign in to see and book slots, challenge friends, and manage your games.
+      </p>
+
+      <button id="google-login-btn" class="primary-btn wide">
+        Continue with Google
+      </button>
+
+      <!-- Placeholder for future phone login -->
+      <!--
+      <button id="phone-login-btn" class="secondary-btn wide">
+        Continue with mobile number
+      </button>
+      -->
+
+      <p class="hint small center">
+        This demo uses Firebase Auth. Phone login can be added later with Firebase Phone Auth.
+      </p>
+    </div>
+  </div>
+
+  <!-- Main app shell (hidden until logged in) -->
+  <div id="app-root" class="app hidden">
     <!-- Top bar -->
     <header class="header">
       <div class="brand">
-        <h1>LeapStart PlayHub</h1>
-        <p class="subtitle">Book Foosball · Carrom · Table Tennis &mdash; 9:00 AM – 5:30 PM</p>
+        <h1>Leapstart PlayHub</h1>
+        <p class="subtitle">Foosball · Carrom · Table Tennis — 9:00 AM – 5:30 PM</p>
       </div>
-      <div class="school-tag">
-        LeapStart School of Technology
+      <div class="header-right">
+        <div class="user-pill" id="user-pill">
+          <img id="user-avatar" class="avatar" alt="">
+          <span id="user-name"></span>
+        </div>
+        <button id="logout-btn" class="secondary-btn small">Log out</button>
       </div>
     </header>
 
@@ -51,7 +86,8 @@
           <div>
             <h2>Day Schedule</h2>
             <p class="hint">
-              Click an available slot to pre‑select it for booking.
+              Click an available slot to pre‑select it for booking. Booked slots
+              show who’s playing, so you can challenge them.
             </p>
           </div>
           <div class="selected-info">
@@ -71,7 +107,7 @@
         </div>
       </section>
 
-      <!-- Right: booking + my bookings -->
+      <!-- Right: booking + my bookings + challenges -->
       <section class="panel booking-panel">
         <div class="booking-header">
           <h2>Book a Slot</h2>
@@ -85,10 +121,6 @@
             <div class="field">
               <label for="student-name">Name</label>
               <input id="student-name" type="text" placeholder="Your full name" required>
-            </div>
-            <div class="field">
-              <label for="student-id">Student ID (optional)</label>
-              <input id="student-id" type="text" placeholder="e.g. LST2025-001">
             </div>
           </div>
 
@@ -116,11 +148,16 @@
         </form>
 
         <section class="my-bookings">
-          <h3>My Bookings (this browser)</h3>
+          <h3>My Bookings</h3>
           <ul id="my-bookings-list"></ul>
+        </section>
+
+        <section class="challenges">
+          <h3>Challenges (for you)</h3>
+          <ul id="challenge-list"></ul>
           <p class="hint small">
-            Bookings are stored only in this browser (demo / portfolio). For a real campus system
-            we’d plug this UI into a shared backend + database.
+            Click “Challenge” on someone else’s booked slot to send them a challenge.  
+            They’ll see it here in their list.
           </p>
         </section>
       </section>
