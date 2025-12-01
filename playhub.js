@@ -1,27 +1,10 @@
-// ===== Firebase init =====
-// Replace THIS with your firebaseConfig from the Firebase console
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  // ... copy ALL keys from your Firebase web app config
-};
+// playhub.js
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-// ===== CONFIG =====
-const SLOT_START_HOUR = 9;   // 9:00
-const SLOT_END_HOUR = 17.5;  // 17:30
+const SLOT_START_HOUR = 9;
+const SLOT_END_HOUR = 17.5;
 const SLOT_MINUTES_STEP = 30;
 
-// ===== DOM =====
-const loginShell = document.getElementById("login-shell");
-const appRoot = document.getElementById("app-root");
-
-const googleLoginBtn = document.getElementById("google-login-btn");
+// DOM
 const logoutBtn = document.getElementById("logout-btn");
 const userNameEl = document.getElementById("user-name");
 const userAvatarEl = document.getElementById("user-avatar");
@@ -42,18 +25,18 @@ const formMessage = document.getElementById("form-message");
 const myBookingsList = document.getElementById("my-bookings-list");
 const challengeList = document.getElementById("challenge-list");
 
-// ===== STATE =====
+// STATE
 let currentUser = null;
 let selectedGame = "Foosball";
 let ALL_SLOTS = [];
 let dayUnsub = null;
 let myBookingsUnsub = null;
 let challengesUnsub = null;
-let dayBookings = [];    // bookings for selected game + date
+let dayBookings = [];
 let myBookings = [];
 let incomingChallenges = [];
 
-// ===== UTILS =====
+// Helpers
 function generateSlots() {
   const slots = [];
   let time = SLOT_START_HOUR * 60;
@@ -94,7 +77,7 @@ function getSelectedDate() {
   return dateInput.value;
 }
 
-// ===== RENDERING =====
+// RENDERING
 function renderSchedule() {
   const date = getSelectedDate();
   selectedGameLabel.textContent = selectedGame;
@@ -116,9 +99,11 @@ function renderSchedule() {
   ALL_SLOTS.forEach((slot) => {
     const card = document.createElement("div");
     card.className = "slot-card";
+
     const timeEl = document.createElement("div");
     timeEl.className = "slot-time";
     timeEl.textContent = slot;
+
     const statusEl = document.createElement("div");
     statusEl.className = "slot-status";
 
@@ -145,15 +130,14 @@ function renderSchedule() {
       if (booking.uid === currentUser?.uid) {
         card.classList.add("mine");
       } else {
-        // Add challenge action
-        const challengeLink = document.createElement("button");
-        challengeLink.textContent = "Challenge";
-        challengeLink.className = "secondary-btn small";
-        challengeLink.style.marginTop = "4px";
-        challengeLink.addEventListener("click", () => {
+        const challengeBtn = document.createElement("button");
+        challengeBtn.textContent = "Challenge";
+        challengeBtn.className = "secondary-btn small";
+        challengeBtn.style.marginTop = "4px";
+        challengeBtn.addEventListener("click", () => {
           createChallenge(booking);
         });
-        card.appendChild(challengeLink);
+        card.appendChild(challengeBtn);
       }
     }
 
@@ -207,7 +191,7 @@ function renderChallenges() {
 
   incomingChallenges
     .slice()
-    .sort((a, b) => b.createdAt?.seconds - a.createdAt?.seconds)
+    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
     .forEach((c) => {
       const li = document.createElement("li");
       li.className = "challenge-item";
@@ -245,7 +229,7 @@ function renderChallenges() {
     });
 }
 
-// ===== FIRESTORE LISTENERS =====
+// Listeners
 function listenToDayBookings() {
   const date = getSelectedDate();
   if (dayUnsub) dayUnsub();
@@ -279,7 +263,7 @@ function listenToMyBookings() {
     .onSnapshot((snap) => {
       myBookings = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       renderMyBookings();
-      listenToDayBookings(); // update mine highlight
+      listenToDayBookings(); // refresh highlights
     });
 }
 
@@ -300,7 +284,7 @@ function listenToChallenges() {
     });
 }
 
-// ===== ACTIONS =====
+// Actions
 async function bookSlot(game, date, slot) {
   if (!currentUser) return;
   const bookingsRef = db.collection("bookings");
@@ -332,8 +316,7 @@ async function createChallenge(booking) {
   if (!currentUser) return;
   if (booking.uid === currentUser.uid) return;
 
-  const challengesRef = db.collection("challenges");
-  await challengesRef.add({
+  await db.collection("challenges").add({
     fromUid: currentUser.uid,
     fromName: currentUser.displayName || "Student",
     toUid: booking.uid,
@@ -351,63 +334,59 @@ async function updateChallengeStatus(id, status) {
   await db.collection("challenges").doc(id).update({ status });
 }
 
-// ===== AUTH =====
-googleLoginBtn.addEventListener("click", async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  try {
-    await auth.signInWithPopup(provider);
-  } catch (err) {
-    alert("Google sign-in failed: " + err.message);
-  }
-});
-
+// Auth guard + init
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
+  window.location.href = "login.html";
 });
 
 auth.onAuthStateChanged(async (user) => {
-  currentUser = user || null;
-
-  if (user) {
-    loginShell.classList.add("hidden");
-    appRoot.classList.remove("hidden");
-
-    userNameEl.textContent = user.displayName || "Student";
-    if (user.photoURL) {
-      userAvatarEl.src = user.photoURL;
-    } else {
-      userAvatarEl.src =
-        "https://ui-avatars.com/api/?name=" +
-        encodeURIComponent(user.displayName || "S");
-    }
-
-    // Ensure user doc exists
-    await db
-      .collection("users")
-      .doc(user.uid)
-      .set(
-        {
-          displayName: user.displayName || null,
-          email: user.email || null,
-          photoURL: user.photoURL || null,
-          lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
-
-    listenToMyBookings();
-    listenToChallenges();
-    listenToDayBookings();
-  } else {
-    loginShell.classList.remove("hidden");
-    appRoot.classList.add("hidden");
-    if (dayUnsub) dayUnsub();
-    if (myBookingsUnsub) myBookingsUnsub();
-    if (challengesUnsub) challengesUnsub();
+  if (!user) {
+    window.location.href = "login.html";
+    return;
   }
+
+  currentUser = user;
+  userNameEl.textContent = user.displayName || "Student";
+  if (user.photoURL) {
+    userAvatarEl.src = user.photoURL;
+  } else {
+    userAvatarEl.src =
+      "https://ui-avatars.com/api/?name=" +
+      encodeURIComponent(user.displayName || "S");
+  }
+
+  await db
+    .collection("users")
+    .doc(user.uid)
+    .set(
+      {
+        displayName: user.displayName || null,
+        email: user.email || null,
+        photoURL: user.photoURL || null,
+        lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+  // Init slots/date once
+  if (!ALL_SLOTS.length) {
+    ALL_SLOTS = generateSlots();
+    populateSlotSelect();
+    const today = new Date().toISOString().slice(0, 10);
+    dateInput.value = today;
+    selectedGame = "Foosball";
+    gameSelect.value = selectedGame;
+    selectedGameLabel.textContent = selectedGame;
+    selectedDateLabel.textContent = formatDateForDisplay(today);
+  }
+
+  listenToMyBookings();
+  listenToChallenges();
+  listenToDayBookings();
 });
 
-// ===== UI EVENTS =====
+// UI events
 gameCards.forEach((card) => {
   card.addEventListener("click", () => {
     gameCards.forEach((c) => c.classList.remove("active"));
@@ -442,13 +421,10 @@ bookingForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Sync display name with auth user for better consistency
   if (currentUser.displayName !== name) {
     await currentUser.updateProfile({ displayName: name });
     await db.collection("users").doc(currentUser.uid).set(
-      {
-        displayName: name,
-      },
+      { displayName: name },
       { merge: true }
     );
   }
@@ -457,27 +433,18 @@ bookingForm.addEventListener("submit", async (e) => {
     await bookSlot(game, date, slot);
     formMessage.style.color = "#22c55e";
     formMessage.textContent = "Slot booked successfully!";
-    setTimeout(() => {
-      formMessage.textContent = "";
-    }, 2500);
+    setTimeout(() => (formMessage.textContent = ""), 2500);
   } catch (err) {
     formMessage.textContent = err.message || "Booking failed.";
   }
 });
 
-// ===== INIT =====
-function init() {
-  ALL_SLOTS = generateSlots();
-  populateSlotSelect();
-
-  const today = new Date().toISOString().slice(0, 10);
-  dateInput.value = today;
-
-  selectedGame = "Foosball";
-  gameSelect.value = selectedGame;
-
-  selectedGameLabel.textContent = selectedGame;
-  selectedDateLabel.textContent = formatDateForDisplay(today);
-}
-
-init();
+// Initial UI setup
+ALL_SLOTS = generateSlots();
+populateSlotSelect();
+const today = new Date().toISOString().slice(0, 10);
+dateInput.value = today;
+selectedGame = "Foosball";
+gameSelect.value = selectedGame;
+selectedGameLabel.textContent = selectedGame;
+selectedDateLabel.textContent = formatDateForDisplay(today);

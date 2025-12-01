@@ -2,42 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Leapstart PlayHub – Game Planner</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Firebase (compat) -->
+  <link rel="stylesheet" href="playhub.css">
+
+  <!-- Firebase compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-init.js"></script>
 </head>
 <body>
-  <!-- Login screen -->
-  <div id="login-shell" class="login-shell">
-    <div class="login-card">
-      <h1>Leapstart PlayHub</h1>
-      <p class="subtitle">Book Foosball, Carrom &amp; Table Tennis slots on campus.</p>
-      <p class="hint center">
-        Sign in to see and book slots, challenge friends, and manage your games.
-      </p>
-
-      <button id="google-login-btn" class="primary-btn wide">
-        Continue with Google
-      </button>
-
-      <!-- Placeholder for future phone login -->
-      <!--
-      <button id="phone-login-btn" class="secondary-btn wide">
-        Continue with mobile number
-      </button>
-      -->
-
-      <p class="hint small center">
-        This demo uses Firebase Auth. Phone login can be added later with Firebase Phone Auth.
-      </p>
-    </div>
-  </div>
-
-  <!-- Main app shell (hidden until logged in) -->
-  <div id="app-root" class="app hidden">
+  <div class="app">
     <!-- Top bar -->
     <header class="header">
       <div class="brand">
@@ -45,7 +21,7 @@
         <p class="subtitle">Foosball · Carrom · Table Tennis — 9:00 AM – 5:30 PM</p>
       </div>
       <div class="header-right">
-        <div class="user-pill" id="user-pill">
+        <div class="user-pill">
           <img id="user-avatar" class="avatar" alt="">
           <span id="user-name"></span>
         </div>
@@ -112,7 +88,7 @@
         <div class="booking-header">
           <h2>Book a Slot</h2>
           <p class="hint">
-            Fill your details once. Pick game &amp; time, then lock your slot.
+            Pick your game &amp; time, then lock your slot.
           </p>
         </div>
 
@@ -156,14 +132,13 @@
           <h3>Challenges (for you)</h3>
           <ul id="challenge-list"></ul>
           <p class="hint small">
-            Click “Challenge” on someone else’s booked slot to send them a challenge.  
-            They’ll see it here in their list.
+            Click “Challenge” on someone else’s booked slot to send them a challenge.
           </p>
         </section>
       </section>
     </main>
   </div>
 
-  <script src="script.js"></script>
+  <script src="playhub.js"></script>
 </body>
 </html>
