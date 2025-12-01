@@ -1,0 +1,571 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+.top-logo {
+  position: fixed;          /* stay at the top even if page scrolls */
+  bottom: 565px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;              /* above the container */
+  pointer-events: none;     /* clicks pass through to the form */
+}
+
+.top-logo img {
+  width: 300px;             /* adjust size if needed */
+  height: auto;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+}
+
+:root {
+    --main-gold: #d4af37;
+    --gold-light: #f4d03f;
+    --gold-dark: #b8941f;
+    --gradient-gold: linear-gradient(135deg, #f4d03f 0%, #d4af37 50%, #b8941f 100%);
+}
+
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+html {
+    height: 100%;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 400;
+}
+
+body {
+    height: 100%;
+    font-size: 62.5%;
+    background: #000000;
+    color: #ffffff;
+    display: flex;
+    perspective: 1600px;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+h1 {
+    font-weight: 700;
+    font-size: 3.0em;
+    text-align: center;
+    color: #ffffff;
+}
+
+form input {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    padding: 14px 18px;
+    margin: .8em 0;
+    width: 100%;
+    font-size: 1.4em;
+    color: #ffffff;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+form input::placeholder {
+    color: #707070;
+}
+
+form input:focus {
+    outline: none;
+    border-color: var(--main-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    background: #0a0a0a;
+}
+
+span {
+    color: #b0b0b0;
+    font-size: 1.4em;
+    display: inline-block;
+    margin: 15px auto;
+    font-weight: 400;
+    user-select: none;
+}
+
+label {
+    float: left;
+    font-size: 1.4em;
+    display: inline-block;
+    user-select: none;
+    color: #b0b0b0;
+}
+
+label:hover {
+    cursor: pointer;
+}
+
+label span {
+    font-size: inherit;
+    line-height: 1em;
+}
+
+label span::before {
+    content: "";
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    border: 2px solid #3a3a3a;
+    vertical-align: bottom;
+    transition: all .1s ease-in-out;
+    margin-right: .2em;
+    transform: scale(0.99);
+    border-radius: 4px;
+}
+
+input[type="checkbox"] {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+input[type="checkbox"]:checked+span::before {
+    border-color: var(--main-gold);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    background: var(--gradient-gold);
+    transform: scale(0.8);
+}
+
+input[type="checkbox"]:focus+span {
+    text-decoration: underline;
+}
+
+input[type="checkbox"]:checked+span {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+span.forget {
+    float: right;
+}
+
+span.clearfix {
+    clear: both;
+    display: table;
+}
+
+span.loginwith {
+    display: block;
+    width: 100%;
+    margin-top: 1.5em;
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+span.loginwith::before {
+    content: "";
+    display: inline-block;
+    width: 42%;
+    border-bottom: 1px solid #3a3a3a;
+    vertical-align: middle;
+    margin-right: 5%;
+}
+
+span.loginwith::after {
+    content: "";
+    display: inline-block;
+    width: 45%;
+    border-bottom: 1px solid #3a3a3a;
+    vertical-align: middle;
+    margin-left: 5%;
+}
+
+span.copy {
+    display: block;
+    font-size: 1em;
+    margin-top: auto;
+    color: #707070;
+}
+
+button {
+    display: block;
+    margin: 1em auto;
+    border-radius: 12px;
+    border: none;
+    background: var(--gradient-gold);
+    color: #000000;
+    font-size: 1.3em;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 700;
+    padding: 1em 2.5em;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+button svg {
+    vertical-align: middle;
+}
+
+button:hover {
+    cursor: pointer;
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+button:hover::before {
+    left: 100%;
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+button:focus {
+    outline: none;
+}
+
+a {
+    transition: all .3s ease;
+    cursor: pointer;
+    color: #b0b0b0;
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--main-gold);
+}
+
+a:hover svg {
+    cursor: pointer;
+    transition: all .3s ease;
+    stroke: var(--main-gold);
+}
+
+#container {
+    width: 100%;
+    max-width: 80em;
+    min-width: 70.5em;
+    height: 50em;
+    position: relative;
+    border-radius: 2em;
+    transform-style: preserve-3d;
+    margin: auto;
+    z-index: 1;
+}
+
+#container>div {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    top: 0;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    padding: 0 4em;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.content p {
+    font-size: 1.4em;
+    color: #b0b0b0;
+    line-height: 1.6;
+}
+
+.login {
+    left: 0;
+    border-radius: 2em 0 0 2em;
+    transform-style: preserve-3d;
+}
+
+.login button {
+    border-radius: 0px;
+    width: 100%;
+}
+
+.login svg {
+    margin: 1em;
+    stroke: #707070;
+    transition: all 0.3s ease;
+}
+
+.login svg:hover {
+    stroke: var(--main-gold);
+}
+
+.login .content {
+    background: #0a0a0a;
+    border-radius: 2em 0 0 2em;
+    border: 1px solid #1a1a1a;
+    border-right: none;
+}
+
+.login h1 {
+    margin-top: auto;
+}
+
+.register {
+    right: 0;
+    border-radius: 0 2em 2em 0;
+    transform-style: preserve-3d;
+}
+
+.register button {
+    border-radius: 0px;
+    width: 100%;
+    margin-bottom: auto;
+}
+
+.register svg {
+    margin: 1em;
+    stroke: #707070;
+    transition: all 0.3s ease;
+}
+
+.register svg:hover {
+    stroke: var(--main-gold);
+}
+
+.register .content {
+    border-radius: 0 2em 2em 0;
+    background: #0a0a0a;
+    padding: 0em 4em;
+    border: 1px solid #1a1a1a;
+    border-left: none;
+}
+
+.page {
+    right: 0;
+    color: #fff;
+    border-radius: 0 2em 2em 0;
+    transform-origin: left center;
+    transition: animation 1s linear;
+}
+
+.page button {
+    border: 2px solid var(--main-gold);
+    background: transparent;
+    color: var(--main-gold);
+}
+
+.page button:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.front {
+    background: linear-gradient(-45deg, #1a1a1a 0%, #000000 100%) no-repeat 0 0/100%;
+    z-index: 3;
+    border: 1px solid #2a2a2a;
+    border-left: none;
+    border-radius: 0 2em 2em 0;
+}
+
+.back {
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) no-repeat 0 0/200%;
+    z-index: 2;
+    border: 1px solid #2a2a2a;
+    border-left: none;
+    border-radius: 0 2em 2em 0;
+}
+
+.back .content {
+    transform: rotateY(180deg);
+}
+
+.active .front {
+    animation: rot-front .6s ease-in-out normal forwards;
+}
+
+.active .back {
+    animation: rot-back .6s ease-in-out normal forwards;
+}
+
+.close .front {
+    animation: close-rot-front .6s ease-in-out normal forwards;
+}
+
+.close .back {
+    animation: close-rot-back .6s ease-in-out normal forwards;
+}
+
+@keyframes rot-front {
+    from {
+        transform: translateZ(2px) rotateY(0deg);
+    }
+
+    to {
+        transform: translateZ(1px) rotateY(-180deg);
+    }
+}
+
+@keyframes rot-back {
+    from {
+        transform: translateZ(1px) rotateY(0deg);
+    }
+
+    to {
+        transform: translateZ(2px) rotateY(-180deg);
+    }
+}
+
+@keyframes close-rot-front {
+    from {
+        transform: translateZ(1px) rotateY(-180deg);
+    }
+
+    to {
+        transform: translateZ(2px) rotateY(0deg);
+    }
+}
+
+@keyframes close-rot-back {
+    from {
+        transform: translateZ(2px) rotateY(-180deg);
+    }
+
+    to {
+        transform: translateZ(1px) rotateY(0deg);
+    }
+}
+
+.active .register .content {
+    transform-origin: left center;
+    animation: show-register .7s ease-in-out normal forwards;
+}
+
+.active .login .content {
+    transform-origin: right center;
+    animation: hide-login .7s ease-in-out normal forwards;
+}
+
+.close .register .content {
+    transform-origin: left center;
+    animation: hide-register .7s ease-in-out normal forwards;
+}
+
+.close .login .content {
+    transform-origin: right center;
+    animation: show-login .7s ease-in-out normal forwards;
+}
+
+@keyframes show-register {
+    from {
+        transform: rotateY(80deg);
+    }
+
+    to {
+        transform: rotateY(0deg);
+    }
+}
+
+@keyframes hide-login {
+    from {
+        transform: rotateY(0.01deg);
+    }
+
+    to {
+        transform: rotateY(-80deg);
+    }
+}
+
+@keyframes hide-register {
+    from {
+        transform: rotateY(0.01deg);
+    }
+
+    to {
+        transform: rotateY(80deg);
+    }
+}
+
+@keyframes show-login {
+    from {
+        transform: rotateY(-80deg);
+    }
+
+    to {
+        transform: rotateY(0deg);
+    }
+}
+
+@media (max-width: 1200px) {
+    #container {
+        min-width: 60em;
+        max-width: 70em;
+    }
+}
+
+@media (max-width: 960px) {
+    body {
+        perspective: 1200px;
+    }
+
+    #container {
+        min-width: 50em;
+        height: 45em;
+    }
+
+    .content {
+        padding: 0 3em;
+    }
+
+    h1 {
+        font-size: 3em;
+    }
+}
+
+@media (max-width: 768px) {
+    #container {
+        min-width: 40em;
+        height: 40em;
+    }
+
+    .content p {
+        font-size: 1.2em;
+    }
+
+    h1 {
+        font-size: 2.5em;
+    }
+
+    form input {
+        font-size: 1.2em;
+        padding: 12px 16px;
+    }
+}
