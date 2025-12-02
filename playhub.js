@@ -1,10 +1,21 @@
 // playhub.js
 
-const SLOT_START_HOUR = 9;
-const SLOT_END_HOUR = 17.5;
-const SLOT_MINUTES_STEP = 30;
+// -----------------------------------------------------------------------------
+// SLOT CONFIG
+// -----------------------------------------------------------------------------
+const SLOT_START_HOUR = 9;        // 9:00
+const SLOT_END_HOUR = 17.5;       // 17:30
+const SLOT_MINUTES_STEP = 15;     // each match = 15 minutes
 
+// Time ranges (minutes from midnight) that must NOT appear / be bookable
+const CLASS_BLOCKS = [
+  { start: 11 * 60, end: 13 * 60 }, // 11:00 – 13:00
+  { start: 14 * 60, end: 15 * 60 }, // 14:00 – 15:00
+];
+
+// -----------------------------------------------------------------------------
 // DOM
+// -----------------------------------------------------------------------------
 const logoutBtn = document.getElementById("logout-btn");
 const userNameEl = document.getElementById("user-name");
 const userAvatarEl = document.getElementById("user-avatar");
@@ -25,7 +36,9 @@ const formMessage = document.getElementById("form-message");
 const myBookingsList = document.getElementById("my-bookings-list");
 const challengeList = document.getElementById("challenge-list");
 
+// -----------------------------------------------------------------------------
 // STATE
+// -----------------------------------------------------------------------------
 let currentUser = null;
 let selectedGame = "Foosball";
 let ALL_SLOTS = [];
@@ -36,17 +49,37 @@ let dayBookings = [];
 let myBookings = [];
 let incomingChallenges = [];
 
-// Helpers
+// -----------------------------------------------------------------------------
+// HELPERS
+// -----------------------------------------------------------------------------
+function timeStringToMinutes(label) {
+  const [h, m] = label.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function isBlockedTime(slotLabel) {
+  const minutes = timeStringToMinutes(slotLabel);
+  return CLASS_BLOCKS.some(
+    (block) => minutes >= block.start && minutes < block.end
+  );
+}
+
 function generateSlots() {
   const slots = [];
   let time = SLOT_START_HOUR * 60;
   const endTime = SLOT_END_HOUR * 60;
+
   while (time <= endTime) {
     const h = Math.floor(time / 60);
     const m = time % 60;
     const label =
       String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
-    slots.push(label);
+
+    // Completely skip blocked/class times
+    if (!isBlockedTime(label)) {
+      slots.push(label);
+    }
+
     time += SLOT_MINUTES_STEP;
   }
   return slots;
@@ -77,7 +110,9 @@ function getSelectedDate() {
   return dateInput.value;
 }
 
+// -----------------------------------------------------------------------------
 // RENDERING
+// -----------------------------------------------------------------------------
 function renderSchedule() {
   const date = getSelectedDate();
   selectedGameLabel.textContent = selectedGame;
@@ -110,6 +145,7 @@ function renderSchedule() {
     const booking = dayBookings.find((b) => b.slot === slot);
 
     if (!booking) {
+      // Available slot
       card.classList.add("available");
       statusEl.textContent = "Available";
       card.addEventListener("click", () => {
@@ -124,6 +160,7 @@ function renderSchedule() {
         bookingForm.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } else {
+      // Already booked
       card.classList.add("booked");
       statusEl.textContent = `Booked by ${booking.displayName || "student"}`;
 
@@ -229,7 +266,9 @@ function renderChallenges() {
     });
 }
 
-// Listeners
+// -----------------------------------------------------------------------------
+// LISTENERS (FIRESTORE)
+// -----------------------------------------------------------------------------
 function listenToDayBookings() {
   const date = getSelectedDate();
   if (dayUnsub) dayUnsub();
@@ -284,22 +323,61 @@ function listenToChallenges() {
     });
 }
 
-// Actions
+// -----------------------------------------------------------------------------
+// ACTIONS
+// -----------------------------------------------------------------------------
 async function bookSlot(game, date, slot) {
   if (!currentUser) return;
+
+  // Safety guard: if someone hacks the UI and sends a blocked time, reject it
+  if (isBlockedTime(slot)) {
+    throw new Error("This time cannot be booked.");
+  }
+
   const bookingsRef = db.collection("bookings");
 
   await db.runTransaction(async (tx) => {
+    // 1) Ensure this (game, date, slot) is free
     const existing = await tx.get(
       bookingsRef
         .where("game", "==", game)
         .where("date", "==", date)
         .where("slot", "==", slot)
+        .limit(1)
     );
     if (!existing.empty) {
       throw new Error("Slot already booked");
     }
 
+    // 2) Get this user's bookings for the same game/date
+    const mySnap = await tx.get(
+      bookingsRef
+        .where("uid", "==", currentUser.uid)
+        .where("game", "==", game)
+        .where("date", "==", date)
+    );
+
+    const userSlots = mySnap.docs.map((d) => d.data().slot);
+    userSlots.push(slot);
+
+    // Sort user's slots by time
+    userSlots.sort(
+      (a, b) => timeStringToMinutes(a) - timeStringToMinutes(b)
+    );
+
+    // 3) Enforce "no more than 2 back‑to‑back slots"
+    const step = SLOT_MINUTES_STEP;
+    for (let i = 0; i <= userSlots.length - 3; i++) {
+      const t1 = timeStringToMinutes(userSlots[i]);
+      const t2 = timeStringToMinutes(userSlots[i + 1]);
+      const t3 = timeStringToMinutes(userSlots[i + 2]);
+
+      if (t2 === t1 + step && t3 === t2 + step) {
+        throw new Error("You cannot book more than 2 back‑to‑back slots.");
+      }
+    }
+
+    // 4) All good – create booking
     const docRef = bookingsRef.doc();
     tx.set(docRef, {
       uid: currentUser.uid,
@@ -334,7 +412,9 @@ async function updateChallengeStatus(id, status) {
   await db.collection("challenges").doc(id).update({ status });
 }
 
-// Auth guard + init
+// -----------------------------------------------------------------------------
+// AUTH GUARD + INIT
+// -----------------------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
   window.location.href = "login.html";
@@ -369,24 +449,14 @@ auth.onAuthStateChanged(async (user) => {
       { merge: true }
     );
 
-  // Init slots/date once
-  if (!ALL_SLOTS.length) {
-    ALL_SLOTS = generateSlots();
-    populateSlotSelect();
-    const today = new Date().toISOString().slice(0, 10);
-    dateInput.value = today;
-    selectedGame = "Foosball";
-    gameSelect.value = selectedGame;
-    selectedGameLabel.textContent = selectedGame;
-    selectedDateLabel.textContent = formatDateForDisplay(today);
-  }
-
   listenToMyBookings();
   listenToChallenges();
   listenToDayBookings();
 });
 
-// UI events
+// -----------------------------------------------------------------------------
+// UI EVENTS
+// -----------------------------------------------------------------------------
 gameCards.forEach((card) => {
   card.addEventListener("click", () => {
     gameCards.forEach((c) => c.classList.remove("active"));
@@ -439,7 +509,9 @@ bookingForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Initial UI setup
+// -----------------------------------------------------------------------------
+// INITIAL UI SETUP
+// -----------------------------------------------------------------------------
 ALL_SLOTS = generateSlots();
 populateSlotSelect();
 const today = new Date().toISOString().slice(0, 10);
@@ -448,3 +520,6 @@ selectedGame = "Foosball";
 gameSelect.value = selectedGame;
 selectedGameLabel.textContent = selectedGame;
 selectedDateLabel.textContent = formatDateForDisplay(today);
+
+// IMPORTANT: render once on load so slots always show, even after refresh
+renderSchedule();
