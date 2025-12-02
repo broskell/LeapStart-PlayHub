@@ -6,43 +6,51 @@
   <title>Leapstart PlayHub – Login</title>
   <link rel="stylesheet" href="login.css">
   <link rel="icon" type="image/png" href="/assets/playhub_html_logo.png">
-
-  <!-- Firebase compat SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-init.js"></script>
+  <!-- Firebase is loaded via auth.js (ES module). No compat scripts here. -->
 </head>
 <body>
-<div class="top-logo">
+  <div class="top-logo">
     <img src="/assets/playhub_logo_nobg.png" alt="Leapstart PlayHub logo">
-</div>
+  </div>
 
-<div id="container">
+  <div id="container">
+    <!-- LEFT: LOGIN -->
     <div class="login">
-        <div class="content">
-            <h1>Welcome Back!</h1>
-        <form>
-          <input type="email" placeholder="email">
-          <input type="password" placeholder="password">
+      <div class="content">
+        <h1>Welcome Back!</h1>
+
+        <form id="login-form">
+          <input type="email" id="login-email" placeholder="email" required>
+          <input type="password" id="login-password" placeholder="password" required>
+
           <div>
             <label class="remember" for="remember">
               <input type="checkbox" id="remember" checked />
               <span>Remember me</span>
             </label>
-            <span class="forget"><a href="#">Forgot password?</a></span>
+            <span class="forget">
+              <a href="#" id="forgot-password-link">Forgot password?</a>
+            </span>
             <span class="clearfix"></span>
           </div>
 
-          <!-- This button will perform Google Login -->
+          <!-- Email/password login -->
+          <button type="submit" class="primary-login-btn">
+            Log in
+          </button>
+
+          <!-- Google login -->
           <button type="button" id="google-login-btn">
             Continue with Google
           </button>
+
+          <!-- Status messages for login / reset -->
+          <div id="login-msg" class="msg"></div>
         </form>
 
         <span class="loginwith">Or Connect with</span>
         <div>
-          <!-- Social icons just for look (no auth attached) -->
+          <!-- Social icons for aesthetics only -->
           <a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -68,12 +76,12 @@
         </div>
 
         <span class="copy">
-            &copy; 2025 Saathvik Kellampalli
+          &copy; 2025 Saathvik Kellampalli
         </span>
       </div>
     </div>
 
-    <!-- Right flipping pages (for aesthetics only) -->
+    <!-- RIGHT: PAGE FLIP & REGISTER AREA (unchanged except for IDs) -->
     <div class="page front">
       <div class="content">
         <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"
@@ -134,21 +142,24 @@
           </svg></a>
         </div>
         <span class="loginwith">Or use email</span>
-        <form>
-          <input type="text" placeholder="name">
-          <input type="email" placeholder="email">
-          <input type="password" placeholder="password">
+
+        <form id="signup-form">
+          <input type="text" id="signup-name" placeholder="name">
+          <input type="email" id="signup-email" placeholder="email" required>
+          <input type="password" id="signup-password" placeholder="password" required>
           <label class="remember" for="terms">
             <input type="checkbox" id="terms" />
             <span>I accept terms</span>
           </label>
           <span class="clearfix"></span>
-          <button type="button">Submit</button>
+          <button type="submit" id="signup-submit-btn">Submit</button>
+          <div id="signup-msg" class="msg"></div>
         </form>
       </div>
     </div>
   </div>
 
   <script src="login.js"></script>
+  <script type="module" src="auth.js"></script>
 </body>
 </html>
