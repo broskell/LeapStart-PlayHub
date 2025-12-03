@@ -19,7 +19,7 @@
     <header class="header">
       <div class="brand">
         <h1>LeapStart PlayHub</h1>
-        <p class="subtitle">Foosball · Carrom · Table Tennis — 9:00 AM – 5:30 PM</p>
+        <p class="subtitle">Foosball · Carrom · Table Tennis · Chess · Uno · 8-Ball Pool — 9:00 AM – 5:30 PM</p>
       </div>
       <div class="header-right">
         <div class="user-pill">
@@ -40,13 +40,32 @@
           <span class="game-title">Foosball</span>
           <span class="game-subtitle">2v2 · quick fun</span>
         </button>
+    
         <button class="game-card" data-game="Carrom">
           <span class="game-title">Carrom</span>
           <span class="game-subtitle">chill &amp; precision</span>
         </button>
-        <button class="game-card" data-game="Table Tennis">
+    
+        <!-- Disabled: will be available on main campus -->
+        <button class="game-card disabled" data-game="Table Tennis" data-disabled="true">
           <span class="game-title">Table Tennis</span>
-          <span class="game-subtitle">fast rallies</span>
+          <span class="game-subtitle">coming soon</span>
+        </button>
+    
+        <button class="game-card" data-game="Chess">
+          <span class="game-title">Chess</span>
+          <span class="game-subtitle">1v1 · strategy</span>
+        </button>
+    
+        <button class="game-card" data-game="Uno">
+          <span class="game-title">UNO</span>
+          <span class="game-subtitle">card game · 2–4 players</span>
+        </button>
+    
+        <!-- Disabled: will be available on main campus -->
+        <button class="game-card disabled" data-game="8 Ball Pool" data-disabled="true">
+          <span class="game-title">8‑Ball Pool</span>
+          <span class="game-subtitle">coming soon</span>
         </button>
       </div>
       <div class="games-date">
@@ -107,7 +126,9 @@
               <select id="game-select" required>
                 <option value="Foosball">Foosball</option>
                 <option value="Carrom">Carrom</option>
-                <option value="Table Tennis">Table Tennis</option>
+                <option value="Chess">Chess</option>
+                <option value="UNO">Uno</option>
+                <!-- Table Tennis & 8‑Ball Pool are disabled in this version -->
               </select>
             </div>
             <div class="field">

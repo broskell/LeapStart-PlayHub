@@ -1,8 +1,13 @@
-// playhub.js – Firestore multi-user, max 2 consecutive slots
+// playhub.js – Firestore multi-user, challenges, new games
+// Games: Foosball, Carrom, Chess, Uno = bookable
+// Table Tennis, 8-Ball Pool = disabled ("future main campus")
 
 // -----------------------------------------------------------------------------
-// SLOT CONFIG
+// CONFIG
 // -----------------------------------------------------------------------------
+const BOOKABLE_GAMES = ["Foosball", "Carrom", "Chess", "Uno"];
+const DISABLED_GAMES = ["Table Tennis", "8 Ball Pool"];
+
 const SLOT_START_HOUR = 9;        // 9:00
 const SLOT_END_HOUR = 17.5;       // 17:30
 const SLOT_MINUTES_STEP = 15;     // 15-minute slots
@@ -43,8 +48,8 @@ let currentUser = null;
 let selectedGame = "Foosball";
 let ALL_SLOTS = [];
 let dayBookings = [];        // bookings for selected game/date
-let myBookings = [];         // bookings for current user
-let incomingChallenges = []; // placeholder for future
+let myBookings = [];         // bookings for logged in user
+let incomingChallenges = []; // challenges for logged in user
 
 // -----------------------------------------------------------------------------
 // HELPERS
@@ -143,7 +148,6 @@ function renderSchedule() {
     const booking = dayBookings.find((b) => b.slot === slot);
 
     if (!booking) {
-      // Available slot
       card.classList.add("available");
       statusEl.textContent = "Available";
       card.addEventListener("click", () => {
@@ -158,7 +162,6 @@ function renderSchedule() {
         bookingForm.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } else {
-      // Already booked
       card.classList.add("booked");
       statusEl.textContent = `Booked by ${booking.displayName || "student"}`;
 
@@ -170,9 +173,7 @@ function renderSchedule() {
         challengeBtn.className = "secondary-btn small";
         challengeBtn.style.marginTop = "4px";
         challengeBtn.addEventListener("click", () => {
-          alert(
-            `Challenge feature vs ${booking.displayName || "student"} is coming soon.`
-          );
+          createChallenge(booking);
         });
         card.appendChild(challengeBtn);
       }
@@ -218,13 +219,54 @@ function renderMyBookings() {
 }
 
 function renderChallenges() {
-  // Placeholder – Firestore-backed challenges can be added later
   challengeList.innerHTML = "";
-  const li = document.createElement("li");
-  li.textContent = "Challenges will appear here in a future version.";
-  li.style.fontSize = "12px";
-  li.style.color = "#9ca3af";
-  challengeList.appendChild(li);
+  if (!incomingChallenges.length) {
+    const li = document.createElement("li");
+    li.textContent = "No challenges yet.";
+    li.style.fontSize = "12px";
+    li.style.color = "#9ca3af";
+    challengeList.appendChild(li);
+    return;
+  }
+
+  incomingChallenges
+    .slice()
+    .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
+    .forEach((c) => {
+      const li = document.createElement("li");
+      li.className = "challenge-item";
+
+      const info = document.createElement("div");
+      info.innerHTML = `<strong>${c.fromName || "Someone"}</strong> challenged you for <strong>${c.game}</strong> · ${c.date} · ${c.slot}<br><span class="challenge-status">Status: ${c.status}</span>`;
+
+      const actions = document.createElement("div");
+      actions.className = "challenge-actions";
+
+      if (c.status === "pending") {
+        const acceptBtn = document.createElement("button");
+        acceptBtn.className = "primary-btn";
+        acceptBtn.textContent = "Accept";
+        acceptBtn.onclick = () => updateChallengeStatus(c.id, "accepted");
+
+        const declineBtn = document.createElement("button");
+        declineBtn.className = "secondary-btn";
+        declineBtn.textContent = "Decline";
+        declineBtn.onclick = () => updateChallengeStatus(c.id, "declined");
+
+        actions.appendChild(acceptBtn);
+        actions.appendChild(declineBtn);
+      } else {
+        const statusBadge = document.createElement("span");
+        statusBadge.className = "badge";
+        statusBadge.textContent =
+          c.status === "accepted" ? "Accepted" : "Declined";
+        actions.appendChild(statusBadge);
+      }
+
+      li.appendChild(info);
+      li.appendChild(actions);
+      challengeList.appendChild(li);
+    });
 }
 
 // -----------------------------------------------------------------------------
@@ -274,11 +316,38 @@ async function loadMyBookings() {
   renderMyBookings();
 }
 
+async function loadChallenges() {
+  if (!currentUser) {
+    incomingChallenges = [];
+    renderChallenges();
+    return;
+  }
+
+  try {
+    const snap = await db
+      .collection("challenges")
+      .where("toUid", "==", currentUser.uid)
+      .get();
+
+    incomingChallenges = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.error("loadChallenges error:", err);
+    incomingChallenges = [];
+  }
+  renderChallenges();
+}
+
 // -----------------------------------------------------------------------------
 // ACTIONS  (max 2 consecutive slots per game/date/user)
 // -----------------------------------------------------------------------------
 async function bookSlot(game, date, slot, displayNameFromForm) {
   if (!currentUser) return;
+
+  if (!BOOKABLE_GAMES.includes(game)) {
+    throw new Error(
+      "This game is not bookable yet. It will be available in a future main campus version."
+    );
+  }
 
   if (isBlockedTime(slot)) {
     throw new Error("This time cannot be booked.");
@@ -304,16 +373,14 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
   const userSlots = mySnap.docs.map((d) => d.data().slot);
   userSlots.push(slot);
 
-  // sort user's slots and enforce "no more than 2 consecutive"
+  // sort & enforce "no more than 2 consecutive"
   userSlots.sort((a, b) => timeStringToMinutes(a) - timeStringToMinutes(b));
   const step = SLOT_MINUTES_STEP;
 
-  // any window of 3 consecutive slots is illegal
   for (let i = 0; i <= userSlots.length - 3; i++) {
     const t1 = timeStringToMinutes(userSlots[i]);
     const t2 = timeStringToMinutes(userSlots[i + 1]);
     const t3 = timeStringToMinutes(userSlots[i + 2]);
-
     if (t2 === t1 + step && t3 === t2 + step) {
       throw new Error(
         "You can book at most 2 back‑to‑back slots. Leave a gap before booking more."
@@ -329,8 +396,32 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
     game,
     date,
     slot,
-    createdAt: new Date().toISOString(), // string
+    createdAt: new Date().toISOString(),
   });
+}
+
+async function createChallenge(booking) {
+  if (!currentUser) return;
+  if (booking.uid === currentUser.uid) return;
+
+  await db.collection("challenges").add({
+    fromUid: currentUser.uid,
+    fromName: currentUser.displayName || "Student",
+    toUid: booking.uid,
+    toName: booking.displayName || "Student",
+    game: booking.game,
+    date: booking.date,
+    slot: booking.slot,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  });
+
+  alert(`Challenge sent to ${booking.displayName || "the player"}`);
+}
+
+async function updateChallengeStatus(id, status) {
+  await db.collection("challenges").doc(id).update({ status });
+  await loadChallenges();
 }
 
 // -----------------------------------------------------------------------------
@@ -338,12 +429,12 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
 // -----------------------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "index.html";
+  window.location.href = "index.html"; // or login.html if you kept that name
 });
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "index.html";
+    window.location.href = "index.html"; // or login.html
     return;
   }
 
@@ -372,17 +463,27 @@ auth.onAuthStateChanged(async (user) => {
 
   await loadMyBookings();
   await loadDayBookings();
-  renderChallenges();
+  await loadChallenges();
 });
 
 // -----------------------------------------------------------------------------
 // UI EVENTS
 // -----------------------------------------------------------------------------
 gameCards.forEach((card) => {
+  const gameName = card.dataset.game;
+  const isDisabled = card.dataset.disabled === "true";
+
   card.addEventListener("click", async () => {
+    if (isDisabled || DISABLED_GAMES.includes(gameName)) {
+      alert(
+        `${gameName} bookings will be available in a future version when we shift to the main campus.`
+      );
+      return;
+    }
+
     gameCards.forEach((c) => c.classList.remove("active"));
     card.classList.add("active");
-    selectedGame = card.dataset.game;
+    selectedGame = gameName;
     gameSelect.value = selectedGame;
     await loadDayBookings();
   });
@@ -412,7 +513,13 @@ bookingForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Optionally sync displayName with typed name
+  if (!BOOKABLE_GAMES.includes(game)) {
+    formMessage.textContent =
+      "This game is not bookable yet. It will be available when we shift to the main campus.";
+    return;
+  }
+
+  // Sync displayName
   if (currentUser.displayName !== name) {
     try {
       await currentUser.updateProfile({ displayName: name });
