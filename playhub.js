@@ -1,4 +1,4 @@
-// playhub.js  – Firestore multi-user version (string-only writes)
+// playhub.js – Firestore multi-user, max 2 consecutive slots
 
 // -----------------------------------------------------------------------------
 // SLOT CONFIG
@@ -218,7 +218,7 @@ function renderMyBookings() {
 }
 
 function renderChallenges() {
-  // For now just placeholder; you can wire Firestore later.
+  // Placeholder – Firestore-backed challenges can be added later
   challengeList.innerHTML = "";
   const li = document.createElement("li");
   li.textContent = "Challenges will appear here in a future version.";
@@ -228,7 +228,7 @@ function renderChallenges() {
 }
 
 // -----------------------------------------------------------------------------
-// LOAD FROM FIRESTORE (simple .get(), no realtime listeners)
+// LOAD FROM FIRESTORE
 // -----------------------------------------------------------------------------
 async function loadDayBookings() {
   const date = getSelectedDate();
@@ -275,7 +275,7 @@ async function loadMyBookings() {
 }
 
 // -----------------------------------------------------------------------------
-// ACTIONS
+// ACTIONS  (max 2 consecutive slots per game/date/user)
 // -----------------------------------------------------------------------------
 async function bookSlot(game, date, slot, displayNameFromForm) {
   if (!currentUser) return;
@@ -294,7 +294,7 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
     throw new Error("Slot already booked");
   }
 
-  // 2) check this user's bookings for same game+date (max 2 back-to-back)
+  // 2) get this user's bookings for same game + date
   const mySnap = await bookingsRef
     .where("uid", "==", currentUser.uid)
     .where("game", "==", game)
@@ -304,19 +304,24 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
   const userSlots = mySnap.docs.map((d) => d.data().slot);
   userSlots.push(slot);
 
+  // sort user's slots and enforce "no more than 2 consecutive"
   userSlots.sort((a, b) => timeStringToMinutes(a) - timeStringToMinutes(b));
   const step = SLOT_MINUTES_STEP;
 
+  // any window of 3 consecutive slots is illegal
   for (let i = 0; i <= userSlots.length - 3; i++) {
     const t1 = timeStringToMinutes(userSlots[i]);
     const t2 = timeStringToMinutes(userSlots[i + 1]);
     const t3 = timeStringToMinutes(userSlots[i + 2]);
+
     if (t2 === t1 + step && t3 === t2 + step) {
-      throw new Error("You cannot book more than 2 back‑to‑back slots.");
+      throw new Error(
+        "You can book at most 2 back‑to‑back slots. Leave a gap before booking more."
+      );
     }
   }
 
-  // 3) create booking – ONLY SIMPLE TYPES (no FieldValue, no Date objects)
+  // 3) create booking – only simple types
   await docRef.set({
     uid: currentUser.uid,
     displayName:
@@ -324,7 +329,7 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
     game,
     date,
     slot,
-    createdAt: new Date().toISOString(), // string, not Firestore Timestamp
+    createdAt: new Date().toISOString(), // string
   });
 }
 
@@ -352,7 +357,6 @@ auth.onAuthStateChanged(async (user) => {
       encodeURIComponent(user.displayName || "S");
   }
 
-  // Ensure user exists in 'users' collection (optional)
   await db
     .collection("users")
     .doc(user.uid)
@@ -366,7 +370,6 @@ auth.onAuthStateChanged(async (user) => {
       { merge: true }
     );
 
-  // Load data after login
   await loadMyBookings();
   await loadDayBookings();
   renderChallenges();
@@ -409,7 +412,7 @@ bookingForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Update Firebase user displayName (optional)
+  // Optionally sync displayName with typed name
   if (currentUser.displayName !== name) {
     try {
       await currentUser.updateProfile({ displayName: name });
