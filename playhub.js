@@ -338,12 +338,12 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
 // -----------------------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 });
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = "index.html";
     return;
   }
 
