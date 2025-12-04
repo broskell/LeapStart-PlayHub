@@ -1,6 +1,4 @@
-// playhub.js – Firestore multi-user, challenges, new games
-// Games: Foosball, Carrom, Chess, Uno = bookable
-// Table Tennis, 8-Ball Pool = disabled ("future main campus")
+// playhub.js – Firestore multi-user, challenges, multiple games
 
 // -----------------------------------------------------------------------------
 // CONFIG
@@ -148,6 +146,7 @@ function renderSchedule() {
     const booking = dayBookings.find((b) => b.slot === slot);
 
     if (!booking) {
+      // Available slot
       card.classList.add("available");
       statusEl.textContent = "Available";
       card.addEventListener("click", () => {
@@ -162,6 +161,7 @@ function renderSchedule() {
         bookingForm.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     } else {
+      // Already booked
       card.classList.add("booked");
       statusEl.textContent = `Booked by ${booking.displayName || "student"}`;
 
@@ -219,17 +219,31 @@ function renderMyBookings() {
 }
 
 function renderChallenges() {
+  const currentDate = getSelectedDate();
+  const currentGame = selectedGame;
+
+  // Filter by selected date and game
+  let list = incomingChallenges.slice();
+  if (currentDate) {
+    list = list.filter((c) => c.date === currentDate);
+  }
+  if (currentGame) {
+    list = list.filter((c) => c.game === currentGame);
+  }
+
   challengeList.innerHTML = "";
-  if (!incomingChallenges.length) {
+  if (!list.length) {
     const li = document.createElement("li");
-    li.textContent = "No challenges yet.";
+    li.textContent = currentDate
+      ? "No challenges for this game on this date."
+      : "No challenges yet.";
     li.style.fontSize = "12px";
     li.style.color = "#9ca3af";
     challengeList.appendChild(li);
     return;
   }
 
-  incomingChallenges
+  list
     .slice()
     .sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""))
     .forEach((c) => {
@@ -345,7 +359,7 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
 
   if (!BOOKABLE_GAMES.includes(game)) {
     throw new Error(
-      "This game is not bookable yet. It will be available in a future main campus version."
+      "This game is not bookable yet. It will be available when we shift to the main campus."
     );
   }
 
@@ -417,6 +431,7 @@ async function createChallenge(booking) {
   });
 
   alert(`Challenge sent to ${booking.displayName || "the player"}`);
+  await loadChallenges();
 }
 
 async function updateChallengeStatus(id, status) {
@@ -429,7 +444,7 @@ async function updateChallengeStatus(id, status) {
 // -----------------------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "index.html"; // or login.html if you kept that name
+  window.location.href = "index.html"; // or login.html if you use that name
 });
 
 auth.onAuthStateChanged(async (user) => {
@@ -486,11 +501,13 @@ gameCards.forEach((card) => {
     selectedGame = gameName;
     gameSelect.value = selectedGame;
     await loadDayBookings();
+    renderChallenges(); // refresh list for new game/date
   });
 });
 
 dateInput.addEventListener("change", async () => {
   await loadDayBookings();
+  renderChallenges(); // refresh list for new date
 });
 
 bookingForm.addEventListener("submit", async (e) => {
