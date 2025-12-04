@@ -1,4 +1,4 @@
-// playhub.js – Firestore multi-user, challenges, multiple games
+// playhub.js – Firestore multi-user + challenges + Honey floating assistant
 
 // -----------------------------------------------------------------------------
 // CONFIG
@@ -26,7 +26,10 @@ const userAvatarEl = document.getElementById("user-avatar");
 const gameCards = document.querySelectorAll(".game-card");
 const dateInput = document.getElementById("date-input");
 const selectedGameLabel = document.getElementById("selected-game-label");
-const selectedDateLabel = document.getElementById("selected-date-label");
+const selectedDateLabel = document.getElementElementById
+  ? document.getElementById("selected-date-label")
+  : document.getElementById("selected-date-label"); // safety
+
 const slotGrid = document.getElementById("slot-grid");
 
 const bookingForm = document.getElementById("booking-form");
@@ -39,6 +42,14 @@ const formMessage = document.getElementById("form-message");
 const myBookingsList = document.getElementById("my-bookings-list");
 const challengeList = document.getElementById("challenge-list");
 
+// Honey widget DOM
+const honeyToggleBtn = document.getElementById("honey-toggle");
+const honeyWidget = document.getElementById("honey-widget");
+const honeyCloseBtn = document.getElementById("honey-close");
+const honeyChatForm = document.getElementById("honey-chat-form");
+const honeyInput = document.getElementById("honey-input");
+const honeyMessages = document.getElementById("honey-chat-messages");
+
 // -----------------------------------------------------------------------------
 // STATE
 // -----------------------------------------------------------------------------
@@ -46,8 +57,11 @@ let currentUser = null;
 let selectedGame = "Foosball";
 let ALL_SLOTS = [];
 let dayBookings = [];        // bookings for selected game/date
-let myBookings = [];         // bookings for logged in user
-let incomingChallenges = []; // challenges for logged in user
+let myBookings = [];         // bookings for logged-in user
+let incomingChallenges = []; // challenges for logged-in user
+
+// Honey chat history
+let honeyHistory = []; // {role:'user'|'assistant', content}
 
 // -----------------------------------------------------------------------------
 // HELPERS
@@ -222,7 +236,6 @@ function renderChallenges() {
   const currentDate = getSelectedDate();
   const currentGame = selectedGame;
 
-  // Filter by selected date and game
   let list = incomingChallenges.slice();
   if (currentDate) {
     list = list.filter((c) => c.date === currentDate);
@@ -414,6 +427,24 @@ async function bookSlot(game, date, slot, displayNameFromForm) {
   });
 }
 
+// Cancel bookings for Honey
+async function cancelBookingByTriple(game, date, time) {
+  if (!currentUser) throw new Error("Not logged in");
+
+  const id = makeSlotId(game, date, time);
+  const docRef = db.collection("bookings").doc(id);
+  const snap = await docRef.get();
+  if (!snap.exists) {
+    throw new Error("No such booking found.");
+  }
+  const data = snap.data();
+  if (data.uid !== currentUser.uid) {
+    throw new Error("That booking is not under your name.");
+  }
+
+  await docRef.delete();
+}
+
 async function createChallenge(booking) {
   if (!currentUser) return;
   if (booking.uid === currentUser.uid) return;
@@ -444,7 +475,7 @@ async function updateChallengeStatus(id, status) {
 // -----------------------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "index.html"; // or login.html if you use that name
+  window.location.href = "index.html"; // or login.html
 });
 
 auth.onAuthStateChanged(async (user) => {
@@ -479,6 +510,11 @@ auth.onAuthStateChanged(async (user) => {
   await loadMyBookings();
   await loadDayBookings();
   await loadChallenges();
+
+  addHoneyMessage(
+    "honey",
+    "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button if you need me."
+  );
 });
 
 // -----------------------------------------------------------------------------
@@ -501,13 +537,13 @@ gameCards.forEach((card) => {
     selectedGame = gameName;
     gameSelect.value = selectedGame;
     await loadDayBookings();
-    renderChallenges(); // refresh list for new game/date
+    renderChallenges();
   });
 });
 
 dateInput.addEventListener("change", async () => {
   await loadDayBookings();
-  renderChallenges(); // refresh list for new date
+  renderChallenges();
 });
 
 bookingForm.addEventListener("submit", async (e) => {
@@ -536,7 +572,6 @@ bookingForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  // Sync displayName
   if (currentUser.displayName !== name) {
     try {
       await currentUser.updateProfile({ displayName: name });
@@ -561,6 +596,148 @@ bookingForm.addEventListener("submit", async (e) => {
     formMessage.textContent = err.message || "Booking failed.";
   }
 });
+
+// -----------------------------------------------------------------------------
+// HONEY FLOATING WIDGET + AI ASSISTANT
+// -----------------------------------------------------------------------------
+function addHoneyMessage(role, text) {
+  if (!honeyMessages) return;
+  const div = document.createElement("div");
+  div.className = "honey-msg " + role;
+  div.textContent = text;
+  honeyMessages.appendChild(div);
+  honeyMessages.scrollTop = honeyMessages.scrollHeight;
+}
+
+function pushHoneyHistory(role, content) {
+  honeyHistory.push({ role, content });
+  if (honeyHistory.length > 20) honeyHistory = honeyHistory.slice(-20);
+}
+
+async function handleHoneyAction(obj) {
+  if (!obj || !obj.action) return;
+
+  const name =
+    nameInput?.value.trim() ||
+    currentUser?.displayName ||
+    "Student";
+
+  if (obj.action === "book") {
+    const { game, date, time } = obj;
+    if (!game || !date || !time) return;
+
+    try {
+      await bookSlot(game, date, time, name);
+      await loadMyBookings();
+      await loadDayBookings();
+      addHoneyMessage(
+        "honey",
+        `Done, I booked ${game} on ${date} at ${time} for you.`
+      );
+    } catch (err) {
+      addHoneyMessage(
+        "honey",
+        `That booking didn't go through: ${err.message}. Want me to try another time?`
+      );
+    }
+  } else if (obj.action === "cancel") {
+    const { game, date, time } = obj;
+    if (!game || !date || !time) return;
+
+    try {
+      await cancelBookingByTriple(game, date, time);
+      await loadMyBookings();
+      await loadDayBookings();
+      addHoneyMessage(
+        "honey",
+        `Okay, I cancelled your ${game} slot on ${date} at ${time}.`
+      );
+    } catch (err) {
+      addHoneyMessage("honey", `Couldn't cancel that: ${err.message}.`);
+    }
+  } else if (obj.action === "suggest" && Array.isArray(obj.suggestions)) {
+    addHoneyMessage(
+      "honey",
+      "Here are some ideas:\n- " + obj.suggestions.join("\n- ")
+    );
+  }
+}
+
+async function callHoneyAssistant(userText) {
+  if (!currentUser) {
+    addHoneyMessage("honey", "Log in first, yaar, then I’ll help you.");
+    return;
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const body = {
+    message: userText,
+    today,
+    currentGame: selectedGame,
+    currentDate: getSelectedDate(),
+    displayName:
+      currentUser.displayName || nameInput?.value.trim() || "Student",
+    history: honeyHistory.slice(-10),
+  };
+
+  try {
+    const resp = await fetch("/.netlify/functions/honey-assistant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    const data = await resp.json();
+    const reply =
+      data.reply || "Hmm, I got a bit confused there, yaar.";
+    addHoneyMessage("honey", reply);
+    pushHoneyHistory("assistant", reply);
+
+    if (data.action && data.action !== "none") {
+      await handleHoneyAction(data);
+    }
+  } catch (err) {
+    console.error("Honey assistant error:", err);
+    addHoneyMessage(
+      "honey",
+      "My brain server glitched. Try again in a bit, okay?"
+    );
+  }
+}
+
+// Floating widget toggle
+if (honeyToggleBtn && honeyWidget) {
+  honeyToggleBtn.addEventListener("click", () => {
+    honeyWidget.classList.add("open");
+    if (honeyInput) honeyInput.focus();
+  });
+}
+
+if (honeyCloseBtn && honeyWidget) {
+  honeyCloseBtn.addEventListener("click", () => {
+    honeyWidget.classList.remove("open");
+  });
+}
+
+// Chat form events
+if (honeyChatForm && honeyInput && honeyMessages) {
+  honeyChatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = honeyInput.value.trim();
+    if (!text) return;
+    honeyInput.value = "";
+    addHoneyMessage("user", text);
+    pushHoneyHistory("user", text);
+    await callHoneyAssistant(text);
+  });
+
+  // Initial greeting (before auth, gets overwritten after auth)
+  addHoneyMessage(
+    "honey",
+    "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button if you need me."
+  );
+}
 
 // -----------------------------------------------------------------------------
 // INITIAL UI SETUP (before login)

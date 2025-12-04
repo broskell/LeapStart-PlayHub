@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leapstart PlayHub – Game Planner</title>
-  <link rel="stylesheet" href="playhub.css">
-  <link rel="icon" type="image/png" href="/assets/playhub_html_logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LeapStart PlayHub – Game Planner</title>
+  <link rel="icon" type="image/png" href="assets/playhub_html_logo.png" />
+  <!-- Styles -->
+  <link rel="stylesheet" href="playhub.css" />
 
   <!-- Firebase compat SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -23,7 +24,7 @@
       </div>
       <div class="header-right">
         <div class="user-pill">
-          <img id="user-avatar" class="avatar" alt="">
+          <img id="user-avatar" class="avatar" alt="User avatar" />
           <span id="user-name"></span>
         </div>
         <button id="logout-btn" class="secondary-btn small">Log out</button>
@@ -40,34 +41,43 @@
           <span class="game-title">Foosball</span>
           <span class="game-subtitle">2v2 · quick fun</span>
         </button>
-    
+
         <button class="game-card" data-game="Carrom">
           <span class="game-title">Carrom</span>
           <span class="game-subtitle">chill &amp; precision</span>
         </button>
-    
-        <!-- Disabled: will be available on main campus -->
-        <button class="game-card disabled" data-game="Table Tennis" data-disabled="true">
+
+        <!-- Disabled: future main campus -->
+        <button
+          class="game-card disabled"
+          data-game="Table Tennis"
+          data-disabled="true"
+        >
           <span class="game-title">Table Tennis</span>
           <span class="game-subtitle">coming soon</span>
         </button>
-    
+
         <button class="game-card" data-game="Chess">
           <span class="game-title">Chess</span>
           <span class="game-subtitle">1v1 · strategy</span>
         </button>
-    
+
         <button class="game-card" data-game="Uno">
           <span class="game-title">UNO</span>
-          <span class="game-subtitle">cards · 4–7 players</span>
+          <span class="game-subtitle">cards · 4-6 players</span>
         </button>
-    
-        <!-- Disabled: will be available on main campus -->
-        <button class="game-card disabled" data-game="8 Ball Pool" data-disabled="true">
+
+        <!-- Disabled: future main campus -->
+        <button
+          class="game-card disabled"
+          data-game="8 Ball Pool"
+          data-disabled="true"
+        >
           <span class="game-title">8‑Ball Pool</span>
           <span class="game-subtitle">coming soon</span>
         </button>
       </div>
+
       <div class="games-date">
         <label for="date-input">Date</label>
         <input id="date-input" type="date" />
@@ -83,7 +93,7 @@
             <h2>Day Schedule</h2>
             <p class="hint">
               Click an available slot to pre‑select it for booking. Booked slots
-              show who’s playing, so you can challenge them.
+              show who’s playing so you can challenge them.
             </p>
           </div>
           <div class="selected-info">
@@ -99,7 +109,7 @@
         </div>
 
         <div id="slot-grid" class="slot-grid">
-          <!-- filled by JS -->
+          <!-- Filled by JS -->
         </div>
       </section>
 
@@ -108,7 +118,8 @@
         <div class="booking-header">
           <h2>Book a Slot</h2>
           <p class="hint">
-            Pick your game &amp; time, then lock your slot.
+            Pick your game &amp; time, then lock your slot. You can also ask Honey
+            (🍯) to handle it for you.
           </p>
         </div>
 
@@ -116,7 +127,12 @@
           <div class="form-row two-col">
             <div class="field">
               <label for="student-name">Name</label>
-              <input id="student-name" type="text" placeholder="Your full name" required>
+              <input
+                id="student-name"
+                type="text"
+                placeholder="Your full name"
+                required
+              />
             </div>
           </div>
 
@@ -127,8 +143,8 @@
                 <option value="Foosball">Foosball</option>
                 <option value="Carrom">Carrom</option>
                 <option value="Chess">Chess</option>
-                <option value="UNO">Uno</option>
-                <!-- Table Tennis & 8‑Ball Pool are disabled in this version -->
+                <option value="Uno">Uno</option>
+                <!-- Table Tennis & 8‑Ball Pool are disabled from booking -->
               </select>
             </div>
             <div class="field">
@@ -142,7 +158,9 @@
 
           <div id="form-message" class="form-message"></div>
 
-          <button type="submit" class="primary-btn">Book this slot</button>
+          <button type="submit" class="primary-btn">
+            Book this slot
+          </button>
         </form>
 
         <section class="my-bookings">
@@ -154,7 +172,7 @@
           <h3>Challenges (for you)</h3>
           <ul id="challenge-list"></ul>
           <p class="hint small">
-            Click “Challenge” on someone else’s booked slot to send them a challenge.
+            Click “Challenge” on someone else's booked slot to send them a challenge.
           </p>
         </section>
       </section>
@@ -165,5 +183,44 @@
     <a href="https://media.kannadaprabha.com/kannadaprabha%2F2025-06-03%2Ffzue4bxp%2FatBtZW6uUsfRvBU-ezgif.com-optimize.gif"><img src="/assets/bgless_sign.png" alt="sign" class="footer-logo"></a>
   </footer>
   <script src="playhub.js"></script>
+
+  <!-- Honey floating assistant button -->
+  <button
+    id="honey-toggle"
+    class="honey-floating-btn"
+    aria-label="Open Honey Assistant"
+  >
+    🍯
+  </button>
+
+  <!-- Honey chat widget -->
+  <div id="honey-widget" class="honey-widget">
+    <div class="honey-widget-header">
+      <span>Honey · PlayHub Assistant</span>
+      <button
+        id="honey-close"
+        class="honey-close-btn"
+        aria-label="Close Honey assistant"
+      >
+        ×
+      </button>
+    </div>
+
+    <div id="honey-chat-messages" class="honey-chat-messages"></div>
+
+    <div class="honey-typing" id="honey-typing" style="display: none;">
+      <span></span><span></span><span></span>
+    </div>
+  
+    <form id="honey-chat-form" class="honey-chat-form">
+      <input
+        id="honey-input"
+        type="text"
+        placeholder="Ask Honey to book, cancel or suggest..."
+        autocomplete="off"
+      />
+      <button type="submit" class="primary-btn small">Send</button>
+    </form>
+  </div>
 </body>
 </html>

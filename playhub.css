@@ -717,6 +717,397 @@ select:focus {
 }
 
 /* ========================================
+HONEY FLOATING ASSISTANT WIDGET
+======================================== */
+
+/* Floating button */
+.honey-floating-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: none;
+  background: var(--gradient-gold);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5), 0 0 0 0 rgba(212, 175, 55, 0.4);
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: pulse-gold 2s infinite;
+}
+
+.honey-floating-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.6), 0 0 0 8px rgba(212, 175, 55, 0.15);
+}
+
+.honey-floating-btn:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5), 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5), 0 0 0 12px rgba(212, 175, 55, 0);
+  }
+}
+
+/* Slide-up chat widget */
+.honey-widget {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  width: 360px;
+  max-height: 500px;
+  background: rgba(10, 10, 10, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(212, 175, 55, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  z-index: 50;
+}
+
+.honey-widget.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Widget header */
+.honey-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  position: relative;
+}
+
+.honey-widget-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: var(--gradient-gold);
+}
+
+.honey-widget-header span {
+  color: var(--accent-gold-light);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.honey-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+  padding: 0;
+}
+
+.honey-close-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+/* Chat messages area */
+.honey-chat-messages {
+  flex: 1;
+  padding: 16px;
+  font-size: 13px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.honey-chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.honey-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.honey-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 10px;
+}
+
+.honey-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Message bubbles */
+.honey-msg {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.honey-msg.user {
+  align-self: flex-end;
+  background: var(--gradient-gold);
+  color: #000000;
+  font-weight: 500;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+}
+
+.honey-msg.honey {
+  align-self: flex-start;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+.honey-msg.honey strong {
+  color: var(--accent-gold-light);
+}
+
+/* Typing indicator */
+.honey-typing {
+  align-self: flex-start;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  border-bottom-left-radius: 4px;
+  display: flex;
+  gap: 4px;
+  max-width: 60px;
+}
+
+.honey-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.honey-typing span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.honey-typing span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Chat form */
+.honey-chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.honey-chat-form input[type="text"] {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.honey-chat-form input[type="text"]::placeholder {
+  color: var(--text-tertiary);
+}
+
+.honey-chat-form input[type="text"]:hover {
+  border-color: var(--border-light);
+}
+
+.honey-chat-form input[type="text"]:focus {
+  border-color: var(--accent-gold);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.honey-chat-form .primary-btn.small {
+  padding: 10px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+  border-radius: 10px;
+}
+
+/* ========================================
+RESPONSIVE HONEY WIDGET
+======================================== */
+
+@media (max-width: 768px) {
+  .honey-floating-btn {
+    right: 20px;
+    bottom: 20px;
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+  }
+
+  .honey-widget {
+    right: 20px;
+    bottom: 84px;
+    width: calc(100vw - 40px);
+    max-width: 340px;
+    max-height: 450px;
+  }
+
+  .honey-chat-messages {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .honey-msg {
+    font-size: 12px;
+    padding: 9px 12px;
+  }
+
+  .honey-chat-form {
+    padding: 12px;
+  }
+
+  .honey-chat-form input[type="text"] {
+    font-size: 12px;
+    padding: 9px 12px;
+  }
+
+  .honey-chat-form .primary-btn.small {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 412px) {
+  .honey-floating-btn {
+    right: 16px;
+    bottom: 16px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .honey-widget {
+    right: 16px;
+    bottom: 76px;
+    width: calc(100vw - 32px);
+    max-height: 400px;
+  }
+
+  .honey-widget-header {
+    padding: 12px 14px;
+  }
+
+  .honey-widget-header span {
+    font-size: 13px;
+  }
+
+  .honey-close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+  }
+
+  .honey-chat-messages {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .honey-msg {
+    font-size: 11px;
+    padding: 8px 10px;
+    max-width: 90%;
+  }
+
+  .honey-chat-form {
+    padding: 10px;
+    gap: 6px;
+  }
+
+  .honey-chat-form input[type="text"] {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  .honey-chat-form .primary-btn.small {
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .honey-widget {
+    max-height: 320px;
+  }
+
+  .honey-floating-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+}
+
+/* ========================================
    FOOTER STYLES - Centered Signature
    ======================================== */
 
