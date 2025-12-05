@@ -16,8 +16,9 @@ const CLASS_BLOCKS = [
   { start: 14 * 60, end: 15 * 60 }, // 14:00 – 15:00
 ];
 
-// Netlify site base (used when running playhub locally via file:// or localhost)
-const HONEY_NETLIFY_BASE = "https://playhub-lst.netlify.app"; // change if your Netlify URL is different
+// Netlify site base – used when running locally via file:// or localhost
+// CHANGE this if your Netlify domain is different.
+const HONEY_NETLIFY_BASE = "https://playhub-lst.netlify.app";
 
 // -----------------------------------------------------------------------------
 // DOM
@@ -62,6 +63,7 @@ let incomingChallenges = []; // challenges for logged-in user
 
 // Honey chat history for Groq context
 let honeyHistory = []; // {role:'user'|'assistant', content}
+let honeyWelcomed = false;   // ensure welcome message appears only once
 
 // -----------------------------------------------------------------------------
 // HELPERS
@@ -511,90 +513,8 @@ auth.onAuthStateChanged(async (user) => {
   await loadDayBookings();
   await loadChallenges();
 
-  addHoneyMessage(
-    "honey",
-    "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button if you need me."
-  );
-});
-
-// -----------------------------------------------------------------------------
-// UI EVENTS
-// -----------------------------------------------------------------------------
-gameCards.forEach((card) => {
-  const gameName = card.dataset.game;
-  const isDisabled = card.dataset.disabled === "true";
-
-  card.addEventListener("click", async () => {
-    if (isDisabled || DISABLED_GAMES.includes(gameName)) {
-      alert(
-        `${gameName} bookings will be available in a future version when we shift to the main campus.`
-      );
-      return;
-    }
-
-    gameCards.forEach((c) => c.classList.remove("active"));
-    card.classList.add("active");
-    selectedGame = gameName;
-    gameSelect.value = selectedGame;
-    await loadDayBookings();
-    renderChallenges();
-  });
-});
-
-dateInput.addEventListener("change", async () => {
-  await loadDayBookings();
-  renderChallenges();
-});
-
-bookingForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  formMessage.style.color = "#ef4444";
-  formMessage.textContent = "";
-
-  if (!currentUser) {
-    formMessage.textContent = "Please log in first.";
-    return;
-  }
-
-  const name = nameInput.value.trim();
-  const game = gameSelect.value;
-  const date = getSelectedDate();
-  const slot = slotSelect.value;
-
-  if (!name || !date || !slot) {
-    formMessage.textContent = "Please fill in all required fields.";
-    return;
-  }
-
-  if (!BOOKABLE_GAMES.includes(game)) {
-    formMessage.textContent =
-      "This game is not bookable yet. It will be available when we shift to the main campus.";
-    return;
-  }
-
-  if (currentUser.displayName !== name) {
-    try {
-      await currentUser.updateProfile({ displayName: name });
-      await db.collection("users").doc(currentUser.uid).set(
-        { displayName: name },
-        { merge: true }
-      );
-    } catch (err) {
-      console.warn("Failed to update displayName:", err);
-    }
-  }
-
-  try {
-    await bookSlot(game, date, slot, name);
-    formMessage.style.color = "#22c55e";
-    formMessage.textContent = "Slot booked successfully!";
-    await loadMyBookings();
-    await loadDayBookings();
-    setTimeout(() => (formMessage.textContent = ""), 2500);
-  } catch (err) {
-    console.error("Booking error:", err);
-    formMessage.textContent = err.message || "Booking failed.";
-  }
+  // One-time Honey welcome (shared with window.load)
+  showHoneyWelcome();
 });
 
 // -----------------------------------------------------------------------------
@@ -613,6 +533,15 @@ function addHoneyMessage(role, text) {
 function pushHoneyHistory(role, content) {
   honeyHistory.push({ role, content });
   if (honeyHistory.length > 20) honeyHistory = honeyHistory.slice(-20);
+}
+
+function showHoneyWelcome() {
+  if (honeyWelcomed) return;
+  honeyWelcomed = true;
+  addHoneyMessage(
+    "honey",
+    "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button and ask me to book or cancel slots."
+  );
 }
 
 async function handleHoneyAction(obj) {
@@ -664,6 +593,24 @@ async function handleHoneyAction(obj) {
   }
 }
 
+function getHoneyEndpoint() {
+  const host = window.location.hostname;
+  const protocol = window.location.protocol;
+
+  const isLocal =
+    protocol === "file:" ||
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "0.0.0.0";
+
+  const endpoint = isLocal
+    ? `${HONEY_NETLIFY_BASE}/.netlify/functions/honey-assistant`
+    : "/.netlify/functions/honey-assistant";
+
+  console.log("Honey endpoint being used:", endpoint);
+  return endpoint;
+}
+
 async function callHoneyAssistant(userText) {
   if (!currentUser) {
     addHoneyMessage("honey", "Log in first, yaar, then I’ll help you.");
@@ -684,12 +631,7 @@ async function callHoneyAssistant(userText) {
     history: honeyHistory.slice(-10),
   };
 
-  // Use production Netlify function when running locally via file:// or localhost
-  const HONEY_ENDPOINT =
-    window.location.hostname === "localhost" ||
-    window.location.protocol === "file:"
-      ? `${HONEY_NETLIFY_BASE}/.netlify/functions/honey-assistant`
-      : "/.netlify/functions/honey-assistant";
+  const HONEY_ENDPOINT = getHoneyEndpoint();
 
   try {
     const resp = await fetch(HONEY_ENDPOINT, {
@@ -698,7 +640,7 @@ async function callHoneyAssistant(userText) {
       body: JSON.stringify(payload),
     });
 
-    const text = await resp.text(); // read raw for debugging
+    const text = await resp.text(); // raw for debugging
     console.log("Honey raw response:", resp.status, text);
 
     if (!resp.ok) {
@@ -770,11 +712,8 @@ window.addEventListener("load", () => {
       await callHoneyAssistant(text);
     });
 
-    // Initial greeting
-    addHoneyMessage(
-      "honey",
-      "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button and ask me to book or cancel slots."
-    );
+    // One-time welcome (shared with auth listener)
+    showHoneyWelcome();
   }
 });
 

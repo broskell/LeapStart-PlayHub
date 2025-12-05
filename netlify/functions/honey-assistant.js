@@ -189,7 +189,7 @@ Behavior:
       parsed = {
         reply:
           content ||
-          "Arre, my brain glitched for a second. Ask me again a bit more clearly?",
+          "Arey, my brain glitched for a second. Ask me again a bit more clearly?",
         action: "none",
         game: null,
         date: null,
@@ -200,7 +200,7 @@ Behavior:
 
     // Basic defaults
     if (!parsed.reply) {
-      parsed.reply = "Arre, I blanked out for a second. Say it again?";
+      parsed.reply = "Arey, I blanked out for a second. Say it again?";
     }
     if (!parsed.action) parsed.action = "none";
     if (!("suggestions" in parsed)) parsed.suggestions = [];
