@@ -5,6 +5,13 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const MODEL = "llama-3.1-8b-instant"; // or any Groq chat model you prefer
 
+// CORS headers so browser preflight (OPTIONS) succeeds
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*", // or "https://playhub-lst.netlify.app"
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 // Helper: remove ```json fences if model returns them
 function stripCodeFences(text) {
   return (text || "")
@@ -16,9 +23,21 @@ function stripCodeFences(text) {
 
 exports.handler = async function (event) {
   try {
+    console.log("Honey function method:", event.httpMethod);
+
+    // Handle CORS preflight
+    if (event.httpMethod === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers: CORS_HEADERS,
+        body: "",
+      };
+    }
+
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         body: JSON.stringify({ error: "Method not allowed" }),
       };
     }
@@ -26,6 +45,7 @@ exports.handler = async function (event) {
     if (!GROQ_API_KEY) {
       return {
         statusCode: 500,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         body: JSON.stringify({ error: "Missing GROQ_API_KEY env var" }),
       };
     }
@@ -36,6 +56,7 @@ exports.handler = async function (event) {
     } catch {
       return {
         statusCode: 400,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         body: JSON.stringify({ error: "Invalid JSON body" }),
       };
     }
@@ -52,6 +73,7 @@ exports.handler = async function (event) {
     if (!message) {
       return {
         statusCode: 400,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         body: JSON.stringify({ error: "Missing message" }),
       };
     }
@@ -150,6 +172,7 @@ Behavior:
       console.error("Groq error:", text);
       return {
         statusCode: 500,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
         body: JSON.stringify({ error: "Groq API error", details: text }),
       };
     }
@@ -184,12 +207,14 @@ Behavior:
 
     return {
       statusCode: 200,
+      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       body: JSON.stringify(parsed),
     };
   } catch (err) {
     console.error("Honey assistant function error:", err);
     return {
       statusCode: 500,
+      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       body: JSON.stringify({ error: "Server error" }),
     };
   }

@@ -16,6 +16,9 @@ const CLASS_BLOCKS = [
   { start: 14 * 60, end: 15 * 60 }, // 14:00 – 15:00
 ];
 
+// Netlify site base (used when running playhub locally via file:// or localhost)
+const HONEY_NETLIFY_BASE = "https://playhub-lst.netlify.app"; // change if your Netlify URL is different
+
 // -----------------------------------------------------------------------------
 // DOM
 // -----------------------------------------------------------------------------
@@ -669,7 +672,7 @@ async function callHoneyAssistant(userText) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  const body = {
+  const payload = {
     message: userText,
     today,
     currentGame: selectedGame,
@@ -681,16 +684,37 @@ async function callHoneyAssistant(userText) {
     history: honeyHistory.slice(-10),
   };
 
+  // Use production Netlify function when running locally via file:// or localhost
+  const HONEY_ENDPOINT =
+    window.location.hostname === "localhost" ||
+    window.location.protocol === "file:"
+      ? `${HONEY_NETLIFY_BASE}/.netlify/functions/honey-assistant`
+      : "/.netlify/functions/honey-assistant";
+
   try {
-    const resp = await fetch("/.netlify/functions/honey-assistant", {
+    const resp = await fetch(HONEY_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
-    const data = await resp.json();
-    const reply =
-      data.reply || "Hmm, I got a bit confused there, yaar.";
+    const text = await resp.text(); // read raw for debugging
+    console.log("Honey raw response:", resp.status, text);
+
+    if (!resp.ok) {
+      throw new Error(`HTTP ${resp.status}: ${text}`);
+    }
+
+    let data = {};
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Failed to parse Honey JSON:", e);
+      }
+    }
+
+    const reply = data.reply || "Hmm, I got a bit confused there, yaar.";
     addHoneyMessage("honey", reply);
     pushHoneyHistory("assistant", reply);
 
