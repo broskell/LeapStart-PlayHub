@@ -26,10 +26,7 @@ const userAvatarEl = document.getElementById("user-avatar");
 const gameCards = document.querySelectorAll(".game-card");
 const dateInput = document.getElementById("date-input");
 const selectedGameLabel = document.getElementById("selected-game-label");
-const selectedDateLabel = document.getElementElementById
-  ? document.getElementById("selected-date-label")
-  : document.getElementById("selected-date-label"); // safety
-
+const selectedDateLabel = document.getElementById("selected-date-label");
 const slotGrid = document.getElementById("slot-grid");
 
 const bookingForm = document.getElementById("booking-form");
@@ -60,7 +57,7 @@ let dayBookings = [];        // bookings for selected game/date
 let myBookings = [];         // bookings for logged-in user
 let incomingChallenges = []; // challenges for logged-in user
 
-// Honey chat history
+// Honey chat history for Groq context
 let honeyHistory = []; // {role:'user'|'assistant', content}
 
 // -----------------------------------------------------------------------------
@@ -601,12 +598,13 @@ bookingForm.addEventListener("submit", async (e) => {
 // HONEY FLOATING WIDGET + AI ASSISTANT
 // -----------------------------------------------------------------------------
 function addHoneyMessage(role, text) {
-  if (!honeyMessages) return;
+  const container = document.getElementById("honey-chat-messages");
+  if (!container) return;
   const div = document.createElement("div");
   div.className = "honey-msg " + role;
   div.textContent = text;
-  honeyMessages.appendChild(div);
-  honeyMessages.scrollTop = honeyMessages.scrollHeight;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
 }
 
 function pushHoneyHistory(role, content) {
@@ -618,7 +616,7 @@ async function handleHoneyAction(obj) {
   if (!obj || !obj.action) return;
 
   const name =
-    nameInput?.value.trim() ||
+    (nameInput && nameInput.value.trim()) ||
     currentUser?.displayName ||
     "Student";
 
@@ -677,7 +675,9 @@ async function callHoneyAssistant(userText) {
     currentGame: selectedGame,
     currentDate: getSelectedDate(),
     displayName:
-      currentUser.displayName || nameInput?.value.trim() || "Student",
+      currentUser.displayName ||
+      (nameInput && nameInput.value.trim()) ||
+      "Student",
     history: honeyHistory.slice(-10),
   };
 
@@ -706,50 +706,65 @@ async function callHoneyAssistant(userText) {
   }
 }
 
-// Floating widget toggle
-if (honeyToggleBtn && honeyWidget) {
-  honeyToggleBtn.addEventListener("click", () => {
-    honeyWidget.classList.add("open");
-    if (honeyInput) honeyInput.focus();
-  });
-}
+// Attach Honey widget events after DOM fully loaded
+window.addEventListener("load", () => {
+  const toggle = document.getElementById("honey-toggle");
+  const widget = document.getElementById("honey-widget");
+  const close = document.getElementById("honey-close");
+  const form = document.getElementById("honey-chat-form");
+  const input = document.getElementById("honey-input");
 
-if (honeyCloseBtn && honeyWidget) {
-  honeyCloseBtn.addEventListener("click", () => {
-    honeyWidget.classList.remove("open");
-  });
-}
-
-// Chat form events
-if (honeyChatForm && honeyInput && honeyMessages) {
-  honeyChatForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const text = honeyInput.value.trim();
-    if (!text) return;
-    honeyInput.value = "";
-    addHoneyMessage("user", text);
-    pushHoneyHistory("user", text);
-    await callHoneyAssistant(text);
+  console.log("Honey DOM on load:", {
+    toggle,
+    widget,
+    close,
+    form,
+    input,
   });
 
-  // Initial greeting (before auth, gets overwritten after auth)
-  addHoneyMessage(
-    "honey",
-    "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button if you need me."
-  );
-}
+  if (toggle && widget) {
+    toggle.addEventListener("click", () => {
+      widget.classList.add("open");
+      if (input) input.focus();
+    });
+  }
+
+  if (close && widget) {
+    close.addEventListener("click", () => {
+      widget.classList.remove("open");
+    });
+  }
+
+  if (form && input) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      addHoneyMessage("user", text);
+      pushHoneyHistory("user", text);
+      await callHoneyAssistant(text);
+    });
+
+    // Initial greeting
+    addHoneyMessage(
+      "honey",
+      "Hey, I'm Honey – your slightly savage PlayHub assistant. Tap the 🍯 button and ask me to book or cancel slots."
+    );
+  }
+});
 
 // -----------------------------------------------------------------------------
 // INITIAL UI SETUP (before login)
 // -----------------------------------------------------------------------------
 ALL_SLOTS = generateSlots();
 populateSlotSelect();
-const today = new Date().toISOString().slice(0, 10);
-dateInput.value = today;
+const todayStr = new Date().toISOString().slice(0, 10);
+dateInput.value = todayStr;
 selectedGame = "Foosball";
 gameSelect.value = selectedGame;
 selectedGameLabel.textContent = selectedGame;
-selectedDateLabel.textContent = formatDateForDisplay(today);
+selectedDateLabel.textContent = formatDateForDisplay(todayStr);
 
 renderSchedule();
 renderMyBookings();
