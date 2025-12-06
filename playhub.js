@@ -518,6 +518,86 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 // -----------------------------------------------------------------------------
+// UI EVENTS (game cards, date picker, booking form)
+// -----------------------------------------------------------------------------
+gameCards.forEach((card) => {
+  const gameName = card.dataset.game;
+  const isDisabled = card.dataset.disabled === "true";
+
+  card.addEventListener("click", async () => {
+    if (isDisabled || DISABLED_GAMES.includes(gameName)) {
+      alert(
+        `${gameName} bookings will be available in a future version when we shift to the main campus.`
+      );
+      return;
+    }
+
+    gameCards.forEach((c) => c.classList.remove("active"));
+    card.classList.add("active");
+    selectedGame = gameName;
+    gameSelect.value = selectedGame;
+    await loadDayBookings();
+    renderChallenges();
+  });
+});
+
+dateInput.addEventListener("change", async () => {
+  await loadDayBookings();
+  renderChallenges();
+});
+
+bookingForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  formMessage.style.color = "#ef4444";
+  formMessage.textContent = "";
+
+  if (!currentUser) {
+    formMessage.textContent = "Please log in first.";
+    return;
+  }
+
+  const name = nameInput.value.trim();
+  const game = gameSelect.value;
+  const date = getSelectedDate();
+  const slot = slotSelect.value;
+
+  if (!name || !date || !slot) {
+    formMessage.textContent = "Please fill in all required fields.";
+    return;
+  }
+
+  if (!BOOKABLE_GAMES.includes(game)) {
+    formMessage.textContent =
+      "This game is not bookable yet. It will be available when we shift to the main campus.";
+    return;
+  }
+
+  if (currentUser.displayName !== name) {
+    try {
+      await currentUser.updateProfile({ displayName: name });
+      await db.collection("users").doc(currentUser.uid).set(
+        { displayName: name },
+        { merge: true }
+      );
+    } catch (err) {
+      console.warn("Failed to update displayName:", err);
+    }
+  }
+
+  try {
+    await bookSlot(game, date, slot, name);
+    formMessage.style.color = "#22c55e";
+    formMessage.textContent = "Slot booked successfully!";
+    await loadMyBookings();
+    await loadDayBookings();
+    setTimeout(() => (formMessage.textContent = ""), 2500);
+  } catch (err) {
+    console.error("Booking error:", err);
+    formMessage.textContent = err.message || "Booking failed.";
+  }
+});
+
+// -----------------------------------------------------------------------------
 // HONEY FLOATING WIDGET + AI ASSISTANT
 // -----------------------------------------------------------------------------
 function addHoneyMessage(role, text) {
