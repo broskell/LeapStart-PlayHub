@@ -17,8 +17,11 @@ const CLASS_BLOCKS = [
 ];
 
 // Netlify site base – used when running locally via file:// or localhost
-// CHANGE this if your Netlify domain is different.
 const HONEY_NETLIFY_BASE = "https://playhub-lst.netlify.app";
+
+// Mobile slot limit config
+const MOBILE_BREAKPOINT = 600;    // pixels
+const MOBILE_INITIAL_SLOTS = 4;   // show only 4 slots initially on mobile
 
 // -----------------------------------------------------------------------------
 // DOM
@@ -60,6 +63,7 @@ let ALL_SLOTS = [];
 let dayBookings = [];        // bookings for selected game/date
 let myBookings = [];         // bookings for logged-in user
 let incomingChallenges = []; // challenges for logged-in user
+let showAllSlots = false;    // mobile: show all slots toggle
 
 // Honey chat history for Groq context
 let honeyHistory = []; // {role:'user'|'assistant', content}
@@ -68,6 +72,10 @@ let honeyWelcomed = false;   // ensure welcome message appears only once
 // -----------------------------------------------------------------------------
 // HELPERS
 // -----------------------------------------------------------------------------
+function isMobile() {
+  return window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
 function timeStringToMinutes(label) {
   const [h, m] = label.split(":").map(Number);
   return h * 60 + m;
@@ -148,7 +156,14 @@ function renderSchedule() {
     return;
   }
 
-  ALL_SLOTS.forEach((slot) => {
+  // Determine how many slots to show
+  const mobile = isMobile();
+  const slotsToRender = (mobile && !showAllSlots) 
+    ? ALL_SLOTS.slice(0, MOBILE_INITIAL_SLOTS) 
+    : ALL_SLOTS;
+  const hiddenCount = ALL_SLOTS.length - MOBILE_INITIAL_SLOTS;
+
+  slotsToRender.forEach((slot) => {
     const card = document.createElement("div");
     card.className = "slot-card";
 
@@ -199,6 +214,35 @@ function renderSchedule() {
     card.appendChild(statusEl);
     slotGrid.appendChild(card);
   });
+
+  // Add "Show More" / "Show Less" button on mobile
+  if (mobile && ALL_SLOTS.length > MOBILE_INITIAL_SLOTS) {
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "slot-toggle-btn";
+    
+    if (showAllSlots) {
+      toggleBtn.innerHTML = `
+        <span>Show Less</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      `;
+    } else {
+      toggleBtn.innerHTML = `
+        <span>Show ${hiddenCount} More Slots</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      `;
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      showAllSlots = !showAllSlots;
+      renderSchedule();
+    });
+
+    slotGrid.appendChild(toggleBtn);
+  }
 }
 
 function renderMyBookings() {
@@ -477,12 +521,12 @@ async function updateChallengeStatus(id, status) {
 // -----------------------------------------------------------------------------
 logoutBtn.addEventListener("click", async () => {
   await auth.signOut();
-  window.location.href = "index.html"; // or login.html
+  window.location.href = "index.html";
 });
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "index.html"; // or login.html
+    window.location.href = "index.html";
     return;
   }
 
@@ -513,7 +557,6 @@ auth.onAuthStateChanged(async (user) => {
   await loadDayBookings();
   await loadChallenges();
 
-  // One-time Honey welcome (shared with window.load)
   showHoneyWelcome();
 });
 
@@ -536,12 +579,19 @@ gameCards.forEach((card) => {
     card.classList.add("active");
     selectedGame = gameName;
     gameSelect.value = selectedGame;
+    
+    // Reset showAllSlots when changing game
+    showAllSlots = false;
+    
     await loadDayBookings();
     renderChallenges();
   });
 });
 
 dateInput.addEventListener("change", async () => {
+  // Reset showAllSlots when changing date
+  showAllSlots = false;
+  
   await loadDayBookings();
   renderChallenges();
 });
@@ -595,6 +645,17 @@ bookingForm.addEventListener("submit", async (e) => {
     console.error("Booking error:", err);
     formMessage.textContent = err.message || "Booking failed.";
   }
+});
+
+// -----------------------------------------------------------------------------
+// WINDOW RESIZE - Re-render schedule on resize (for responsive behavior)
+// -----------------------------------------------------------------------------
+let resizeTimeout;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    renderSchedule();
+  }, 150);
 });
 
 // -----------------------------------------------------------------------------
@@ -693,7 +754,7 @@ function getHoneyEndpoint() {
 
 async function callHoneyAssistant(userText) {
   if (!currentUser) {
-    addHoneyMessage("honey", "Log in first, yaar, then I’ll help you.");
+    addHoneyMessage("honey", "Log in first, yaar, then I'll help you.");
     return;
   }
 
@@ -720,7 +781,7 @@ async function callHoneyAssistant(userText) {
       body: JSON.stringify(payload),
     });
 
-    const text = await resp.text(); // raw for debugging
+    const text = await resp.text();
     console.log("Honey raw response:", resp.status, text);
 
     if (!resp.ok) {
@@ -792,7 +853,6 @@ window.addEventListener("load", () => {
       await callHoneyAssistant(text);
     });
 
-    // One-time welcome (shared with auth listener)
     showHoneyWelcome();
   }
 });
