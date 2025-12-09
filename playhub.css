@@ -717,6 +717,15 @@ select:focus {
 }
 
 /* ========================================
+   SLOT TOGGLE BUTTON (Show More/Less)
+   Black & Gold Theme - Desktop Hidden
+   ======================================== */
+
+.slot-toggle-btn {
+  display: none;
+}
+
+/* ========================================
 HONEY FLOATING ASSISTANT WIDGET
 ======================================== */
 
@@ -992,10 +1001,339 @@ HONEY FLOATING ASSISTANT WIDGET
 }
 
 /* ========================================
-RESPONSIVE HONEY WIDGET
-======================================== */
+   FOOTER STYLES
+   ======================================== */
+
+footer {
+  width: 100%;
+  background: #000000;
+  margin-top: auto;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 2px;
+  background: var(--gradient-gold);
+  border-radius: 2px;
+}
+
+.footer-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+footer img {
+  display: block;
+  max-width: 265px;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  margin-top: 17px;
+  background: transparent;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 20px rgba(212, 175, 55, 0.4));
+  transition: all 0.4s ease;
+}
+
+footer img:hover {
+  filter: drop-shadow(0 6px 30px rgba(212, 175, 55, 0.6));
+  transform: scale(1.03);
+}
+
+.footer-text {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.footer-copyright {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE STYLES
+   All Mobile Devices (max-width: 768px)
+   ======================================== */
 
 @media (max-width: 768px) {
+  body {
+    padding: 16px;
+  }
+
+  body::before {
+    width: 100%;
+    height: 300px;
+  }
+
+  .app {
+    padding: 20px;
+    border-radius: 20px;
+    gap: 20px;
+  }
+
+  /* Header */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .header::after {
+    width: 80px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Games Row */
+  .games-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .games-list {
+    width: 100%;
+  }
+
+  .game-card {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    max-width: calc(50% - 6px);
+  }
+
+  .games-date {
+    width: 100%;
+  }
+
+  .games-date input[type="date"] {
+    width: 100%;
+  }
+
+  /* Main Layout */
+  .main {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  /* Panels */
+  .panel {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  /* Schedule Header */
+  .schedule-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .selected-info {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Legend */
+  .legend {
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11px;
+  }
+
+  /* Slot Grid */
+  .slot-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .slot-card {
+    padding: 14px 16px;
+    background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+    border: 1px solid #2a2a2a;
+  }
+
+  .slot-card.available {
+    border: 1px dashed #3a3a3a;
+  }
+
+  .slot-card.available:hover,
+  .slot-card.available:active {
+    border: 1px solid var(--accent-gold);
+    background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+  }
+
+  .slot-card.mine {
+    border: 1px solid var(--accent-gold);
+    background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+  }
+
+  .slot-time {
+    font-size: 15px;
+    color: #ffffff;
+  }
+
+  .slot-status {
+    font-size: 12px;
+    color: #707070;
+  }
+
+  .slot-card.mine .slot-status {
+    color: var(--accent-gold);
+  }
+
+  /* Show More Button - Visible on Mobile */
+  .slot-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 24px;
+    margin-top: 12px;
+    border: 1px solid var(--accent-gold);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+    color: var(--accent-gold);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    grid-column: 1 / -1;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(212, 175, 55, 0.1);
+  }
+
+  .slot-toggle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(212, 175, 55, 0.2),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .slot-toggle-btn:hover::before,
+  .slot-toggle-btn:active::before {
+    left: 100%;
+  }
+
+  .slot-toggle-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: var(--gradient-gold);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .slot-toggle-btn:hover::after,
+  .slot-toggle-btn:active::after {
+    opacity: 1;
+  }
+
+  .slot-toggle-btn:hover,
+  .slot-toggle-btn:active {
+    background: linear-gradient(145deg, #1a1a1a, #252525);
+    color: var(--accent-gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(212, 175, 55, 0.15),
+                inset 0 1px 0 rgba(212, 175, 55, 0.2);
+  }
+
+  .slot-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(212, 175, 55, 0.1);
+  }
+
+  .slot-toggle-btn span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .slot-toggle-btn svg {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+    stroke: var(--accent-gold);
+  }
+
+  .slot-toggle-btn:hover svg,
+  .slot-toggle-btn:active svg {
+    stroke: var(--accent-gold-light);
+    transform: translateY(3px);
+  }
+
+  /* Form adjustments */
+  .form-row.two-col {
+    flex-direction: column;
+  }
+
+  /* Footer */
+  .footer-container {
+    padding: 32px 20px;
+  }
+
+  footer img {
+    max-width: 200px;
+  }
+
+  footer::before {
+    width: 120px;
+  }
+
+  /* Honey Widget */
   .honey-floating-btn {
     right: 20px;
     bottom: 20px;
@@ -1037,7 +1375,278 @@ RESPONSIVE HONEY WIDGET
   }
 }
 
-@media (max-width: 412px) {
+/* ========================================
+   MEDIUM MOBILE (max-width: 600px)
+   ======================================== */
+
+@media (max-width: 600px) {
+  body {
+    padding: 14px;
+  }
+
+  .app {
+    padding: 18px 14px;
+    gap: 18px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .user-pill {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .game-card {
+    padding: 10px 12px;
+  }
+
+  .game-card .game-title {
+    font-size: 13px;
+  }
+
+  .game-card .game-subtitle {
+    font-size: 11px;
+  }
+
+  .panel {
+    padding: 16px 14px;
+  }
+
+  .panel h2 {
+    font-size: 18px;
+  }
+
+  .pill-label {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .legend {
+    gap: 10px;
+    font-size: 10px;
+  }
+
+  .pill {
+    width: 14px;
+    height: 8px;
+  }
+
+  /* Buttons */
+  .primary-btn,
+  .secondary-btn {
+    padding: 11px 18px;
+    font-size: 13px;
+  }
+
+  .secondary-btn.small {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+
+  /* Lists */
+  .my-bookings,
+  .challenges {
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+
+  .my-bookings h3,
+  .challenges h3 {
+    font-size: 15px;
+  }
+
+  #my-bookings-list,
+  #challenge-list {
+    max-height: 180px;
+  }
+
+  .my-bookings-item,
+  .challenge-item {
+    padding: 10px;
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .badge {
+    font-size: 9px;
+    padding: 3px 6px;
+  }
+
+  /* Footer */
+  footer::before {
+    width: 100px;
+  }
+
+  footer img {
+    max-width: 180px;
+  }
+
+  .footer-text {
+    font-size: 11px;
+  }
+}
+
+/* ========================================
+   SMALL MOBILE (max-width: 480px)
+   ======================================== */
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+
+  .app {
+    padding: 16px 12px;
+    border-radius: 16px;
+    gap: 16px;
+  }
+
+  .login-card {
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
+
+  .login-card h1 {
+    font-size: 24px;
+  }
+
+  .header {
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .header::after {
+    width: 60px;
+  }
+
+  .games-row {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .games-label {
+    font-size: 10px;
+  }
+
+  .games-list {
+    gap: 8px;
+  }
+
+  .game-card {
+    flex: 1 1 calc(50% - 4px);
+    max-width: calc(50% - 4px);
+    padding: 8px 10px;
+  }
+
+  .game-card .game-title {
+    font-size: 12px;
+  }
+
+  .game-card .game-subtitle {
+    font-size: 10px;
+  }
+
+  .games-date input[type="date"] {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .panel {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+
+  .panel h2 {
+    font-size: 16px;
+  }
+
+  .schedule-header {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .legend {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    gap: 8px;
+  }
+
+  .slot-card {
+    padding: 12px 14px;
+  }
+
+  .slot-time {
+    font-size: 14px;
+  }
+
+  .slot-status {
+    font-size: 11px;
+  }
+
+  .slot-toggle-btn {
+    padding: 14px 20px;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  /* Form */
+  .form-row {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  label {
+    font-size: 12px;
+  }
+
+  input,
+  select {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .hint {
+    font-size: 11px;
+  }
+
+  .form-message {
+    font-size: 12px;
+  }
+
+  /* Footer */
+  .footer-container {
+    padding: 24px 16px;
+  }
+
+  footer img {
+    max-width: 160px;
+  }
+
+  footer::before {
+    width: 80px;
+  }
+
+  .footer-text {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .footer-copyright {
+    font-size: 9px;
+  }
+
+  /* Honey Widget */
   .honey-floating-btn {
     right: 16px;
     bottom: 16px;
@@ -1047,9 +1656,9 @@ RESPONSIVE HONEY WIDGET
   }
 
   .honey-widget {
-    right: 16px;
-    bottom: 76px;
-    width: calc(100vw - 32px);
+    right: 12px;
+    bottom: 72px;
+    width: calc(100vw - 24px);
     max-height: 400px;
   }
 
@@ -1075,7 +1684,7 @@ RESPONSIVE HONEY WIDGET
   .honey-msg {
     font-size: 11px;
     padding: 8px 10px;
-    max-width: 90%;
+    max-width: 88%;
   }
 
   .honey-chat-form {
@@ -1094,361 +1703,91 @@ RESPONSIVE HONEY WIDGET
   }
 }
 
-/* Landscape mode adjustments */
-@media (max-height: 600px) and (orientation: landscape) {
-  .honey-widget {
-    max-height: 320px;
-  }
-
-  .honey-floating-btn {
-    width: 44px;
-    height: 44px;
-    font-size: 22px;
-  }
-}
-
 /* ========================================
-   FOOTER STYLES - Centered Signature
+   EXTRA SMALL MOBILE (max-width: 380px)
    ======================================== */
 
-footer {
-  width: 100%;
-  background: #000000;
-  margin-top: auto;
-  padding: 0;
-  position: relative;
-  z-index: 10;
-}
-
-/* Gold divider line at top */
-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 2px;
-  background: var(--gradient-gold);
-  border-radius: 2px;
-}
-
-/* Footer container - centers everything */
-.footer-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 40px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-/* Centered backgroundless image */
-footer img {
-  display: block;
-  max-width: 265px;
-  width: auto;
-  height: auto;
-  margin: 0 auto;
-  margin-top: 17px;
-  
-  /* For transparent/backgroundless images */
-  background: transparent;
-  object-fit: contain;
-  
-  /* Gold glow effect */
-  filter: drop-shadow(0 4px 20px rgba(212, 175, 55, 0.4));
-  
-  /* Smooth hover transition */
-  transition: all 0.4s ease;
-}
-
-footer img:hover {
-  filter: drop-shadow(0 6px 30px rgba(212, 175, 55, 0.6));
-  transform: scale(1.03);
-}
-
-/* Optional: Footer text below image */
-.footer-text {
-  margin-top: 20px;
-  font-size: 12px;
-  color: var(--text-tertiary);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.footer-copyright {
-  margin-top: 12px;
-  font-size: 11px;
-  color: var(--text-tertiary);
-  opacity: 0.6;
-}
-
-/* ========================================
-   RESPONSIVE FOOTER
-   ======================================== */
-
-@media (max-width: 768px) {
-  .footer-container {
-    padding: 32px 20px;
-  }
-  
-  footer img {
-    max-width: 200px;
-  }
-  
-  footer::before {
-    width: 120px;
-  }
-  
-  .footer-text {
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-container {
-    padding: 24px 16px;
-  }
-  
-  footer img {
-    max-width: 160px;
-  }
-  
-  footer::before {
-    width: 80px;
-  }
-  
-  .footer-text {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-  }
-  
-  .footer-copyright {
-    font-size: 9px;
-  }
-}
-@media (max-width: 480px) {
+@media (max-width: 380px) {
   body {
-    padding: 12px;
+    padding: 10px;
   }
+
   .app {
-    padding: 16px;
-    border-radius: 16px;
-  }
-  .login-card {
-    padding: 28px;
-  }
-  .header h1 {
-    font-size: 20px;
-  }
-  .games-row {
-    padding: 12px;
-  }
-  .slot-grid {
-    grid-template-columns: 1fr;
-  }
-  .panel {
-    padding: 16px;
-  }
-  
-  /* Footer mobile */
-  .footer-container {
-    padding: 24px 16px;
-  }
-  
-  footer img,
-  .footer-logo,
-  .footer-sign {
-    max-width: 150px;
-  }
-  
-  footer::before {
-    width: 80px;
-  }
-  
-  .footer-text {
-    font-size: 10px;
-  }
-  
-  .footer-copyright {
-    font-size: 10px;
-  }
-}
-
-/* ========================================
-MEDIA QUERY FOR 412x914 (Common Mobile Size)
-======================================== */
-
-@media (max-width: 412px) and (min-height: 800px) {
-  body {
-    padding: 16px 12px;
-    font-size: 60%;
-  }
-
-  /* App Container */
-  .app {
-    padding: 20px 16px;
-    border-radius: 16px;
-    gap: 20px;
-    max-width: 100%;
-  }
-
-  /* Login Card */
-  .login-shell {
-    max-width: 100%;
-    padding: 0 8px;
+    padding: 14px 10px;
+    gap: 14px;
   }
 
   .login-card {
-    padding: 32px 24px;
-    border-radius: 16px;
+    padding: 24px 16px;
   }
 
   .login-card h1 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .subtitle {
     font-size: 13px;
-    margin-bottom: 20px;
-  }
-
-  /* Header */
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    padding-bottom: 20px;
   }
 
   .header h1 {
-    font-size: 22px;
-  }
-
-  .header .subtitle {
-    font-size: 13px;
-    margin-top: 4px;
-  }
-
-  .header::after {
-    width: 80px;
-  }
-
-  .header-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .user-pill {
-    font-size: 13px;
-    padding: 6px 12px;
-  }
-
-  .avatar {
-    width: 24px;
-    height: 24px;
-  }
-
-  /* Games Row */
-  .games-row {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 16px 12px;
-  }
-
-  .games-label {
-    font-size: 11px;
-  }
-
-  .games-list {
-    gap: 10px;
-    width: 100%;
-  }
-
-  .game-card {
-    min-width: 0;
-    flex: 1 1 calc(50% - 5px);
-    max-width: calc(50% - 5px);
-    padding: 10px 12px;
-  }
-
-  .game-card .game-title {
-    font-size: 13px;
-  }
-
-  .game-card .game-subtitle {
-    font-size: 11px;
-  }
-
-  .games-date {
-    width: 100%;
-  }
-
-  .games-date input[type="date"] {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  /* Main Layout */
-  .main {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  /* Panels */
-  .panel {
-    padding: 18px 14px;
-    border-radius: 16px;
-  }
-
-  .panel h2 {
     font-size: 18px;
   }
 
-  /* Schedule Header */
-  .schedule-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
+  .header .subtitle {
+    font-size: 12px;
   }
 
-  .selected-info {
-    width: 100%;
-    align-items: flex-start;
-  }
-
-  .pill-label {
-    font-size: 11px;
+  .user-pill {
+    font-size: 12px;
     padding: 5px 10px;
   }
 
-  /* Legend */
-  .legend {
-    flex-wrap: wrap;
-    gap: 12px;
+  .avatar {
+    width: 22px;
+    height: 22px;
+  }
+
+  .games-row {
+    padding: 10px;
+  }
+
+  .game-card {
+    padding: 8px;
+  }
+
+  .game-card .game-title {
     font-size: 11px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
+  }
+
+  .game-card .game-subtitle {
+    font-size: 9px;
+  }
+
+  .panel {
+    padding: 12px 10px;
+  }
+
+  .panel h2 {
+    font-size: 15px;
+  }
+
+  .pill-label {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .legend {
+    font-size: 9px;
+    gap: 6px;
   }
 
   .pill {
-    width: 14px;
-    height: 8px;
-  }
-
-  /* Slot Grid */
-  .slot-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    width: 12px;
+    height: 6px;
   }
 
   .slot-card {
-    padding: 12px;
+    padding: 10px 12px;
   }
 
   .slot-time {
@@ -1459,137 +1798,68 @@ MEDIA QUERY FOR 412x914 (Common Mobile Size)
     font-size: 10px;
   }
 
-  /* Form Elements */
-  .form-row {
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-
-  .form-row.two-col {
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .field {
-    gap: 6px;
-  }
-
-  label {
+  .slot-toggle-btn {
+    padding: 12px 16px;
     font-size: 12px;
+    letter-spacing: 0.03em;
   }
 
-  input,
-  select {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  .hint {
-    font-size: 12px;
-  }
-
-  .form-message {
-    font-size: 12px;
-    min-height: 18px;
-  }
-
-  /* Buttons */
   .primary-btn,
   .secondary-btn {
-    padding: 11px 18px;
-    font-size: 13px;
-    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 12px;
   }
 
   .secondary-btn.small {
-    padding: 7px 12px;
-    font-size: 11px;
-  }
-
-  /* Lists */
-  .my-bookings,
-  .challenges {
-    margin-top: 20px;
-    padding-top: 20px;
+    padding: 6px 10px;
+    font-size: 10px;
   }
 
   .my-bookings h3,
   .challenges h3 {
-    font-size: 15px;
-    margin-bottom: 10px;
-  }
-
-  #my-bookings-list,
-  #challenge-list {
-    max-height: 180px;
+    font-size: 14px;
   }
 
   .my-bookings-item,
   .challenge-item {
-    padding: 10px;
-    font-size: 12px;
-    gap: 10px;
-    margin-bottom: 6px;
+    padding: 8px;
+    font-size: 11px;
   }
 
   .badge {
-    font-size: 9px;
-    padding: 3px 6px;
-  }
-
-  .challenge-status {
-    font-size: 11px;
+    font-size: 8px;
+    padding: 2px 5px;
   }
 
   .challenge-actions button {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-
-  /* Footer */
-  footer::before {
-    width: 100px;
-  }
-
-  .footer-container {
-    padding: 28px 16px;
+    font-size: 10px;
+    padding: 5px 8px;
   }
 
   footer img {
-    max-width: 180px;
+    max-width: 140px;
+  }
+
+  footer::before {
+    width: 60px;
   }
 
   .footer-text {
-    font-size: 10px;
-    margin-top: 16px;
-    letter-spacing: 0.12em;
+    font-size: 9px;
   }
 
   .footer-copyright {
-    font-size: 9px;
-    margin-top: 10px;
-  }
-
-  /* Scrollbars for mobile */
-  #my-bookings-list::-webkit-scrollbar,
-  #challenge-list::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  #my-bookings-list::-webkit-scrollbar-thumb,
-  #challenge-list::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 10px;
+    font-size: 8px;
   }
 }
 
 /* ========================================
-ADDITIONAL ADJUSTMENTS FOR SHORTER SCREENS
-======================================== */
+   SPECIFIC: 412x914 (Common Android Size)
+   ======================================== */
 
-@media (max-width: 412px) and (max-height: 914px) and (min-height: 700px) {
+@media (max-width: 420px) and (min-height: 800px) {
   body {
-    padding: 12px 10px;
+    padding: 14px 12px;
   }
 
   .app {
@@ -1597,32 +1867,88 @@ ADDITIONAL ADJUSTMENTS FOR SHORTER SCREENS
     gap: 18px;
   }
 
-  .header {
-    padding-bottom: 16px;
+  .header h1 {
+    font-size: 21px;
   }
 
   .games-row {
     padding: 14px 12px;
   }
 
-  .panel {
-    padding: 16px 12px;
+  .game-card {
+    padding: 10px 12px;
   }
 
-  .footer-container {
-    padding: 24px 14px;
+  .game-card .game-title {
+    font-size: 13px;
+  }
+
+  .panel {
+    padding: 16px 14px;
+  }
+
+  .panel h2 {
+    font-size: 17px;
+  }
+
+  .slot-card {
+    padding: 14px 16px;
+  }
+
+  .slot-time {
+    font-size: 15px;
+  }
+
+  .slot-status {
+    font-size: 12px;
+  }
+
+  .slot-toggle-btn {
+    padding: 16px 22px;
+    font-size: 13px;
+    margin-top: 14px;
+  }
+
+  .my-bookings,
+  .challenges {
+    margin-top: 18px;
+    padding-top: 18px;
+  }
+
+  footer::before {
+    width: 100px;
   }
 
   footer img {
-    max-width: 160px;
+    max-width: 170px;
   }
 }
 
 /* ========================================
-LANDSCAPE MODE FOR 412px WIDTH DEVICES
-======================================== */
+   SPECIFIC: iPhone SE / Small iPhones
+   ======================================== */
 
-@media (max-width: 914px) and (max-height: 412px) and (orientation: landscape) {
+@media (max-width: 375px) and (min-height: 600px) {
+  .header h1 {
+    font-size: 19px;
+  }
+
+  .game-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .slot-toggle-btn {
+    padding: 14px 18px;
+    font-size: 12px;
+  }
+}
+
+/* ========================================
+   LANDSCAPE MODE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
   body {
     padding: 12px 16px;
   }
@@ -1656,8 +1982,14 @@ LANDSCAPE MODE FOR 412px WIDTH DEVICES
   }
 
   .slot-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 10px;
+  }
+
+  .slot-toggle-btn {
+    grid-column: 1 / -1;
+    padding: 12px 18px;
+    font-size: 12px;
   }
 
   .footer-container {
@@ -1667,195 +1999,14 @@ LANDSCAPE MODE FOR 412px WIDTH DEVICES
   footer img {
     max-width: 140px;
   }
-}
-/* ========================================
-   SLOT TOGGLE BUTTON (Show More/Less)
-   Black & Gold Theme
-   ======================================== */
 
-.slot-toggle-btn {
-    display: none; /* Hidden on desktop */
-}
+  .honey-widget {
+    max-height: 300px;
+  }
 
-@media (max-width: 600px) {
-    .slot-toggle-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 16px 24px;
-        margin-top: 12px;
-        border: 1px solid var(--accent-gold);
-        border-radius: 12px;
-        background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
-        color: var(--accent-gold);
-        font-size: 14px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        grid-column: 1 / -1;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4),
-                    inset 0 1px 0 rgba(212, 175, 55, 0.1);
-    }
-
-    /* Gold shimmer effect on hover */
-    .slot-toggle-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(212, 175, 55, 0.2),
-            transparent
-        );
-        transition: left 0.5s ease;
-    }
-
-    .slot-toggle-btn:hover::before {
-        left: 100%;
-    }
-
-    /* Gold gradient border effect */
-    .slot-toggle-btn::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 12px;
-        padding: 1px;
-        background: var(--gradient-gold);
-        -webkit-mask: 
-            linear-gradient(#fff 0 0) content-box, 
-            linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .slot-toggle-btn:hover::after {
-        opacity: 1;
-    }
-
-    .slot-toggle-btn:hover,
-    .slot-toggle-btn:active {
-        background: linear-gradient(145deg, #1a1a1a, #252525);
-        color: var(--accent-gold-light);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5),
-                    0 0 20px rgba(212, 175, 55, 0.15),
-                    inset 0 1px 0 rgba(212, 175, 55, 0.2);
-    }
-
-    .slot-toggle-btn:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4),
-                    inset 0 1px 0 rgba(212, 175, 55, 0.1);
-    }
-
-    .slot-toggle-btn span {
-        position: relative;
-        z-index: 1;
-    }
-
-    .slot-toggle-btn svg {
-        position: relative;
-        z-index: 1;
-        transition: transform 0.3s ease;
-        stroke: var(--accent-gold);
-    }
-
-    .slot-toggle-btn:hover svg {
-        stroke: var(--accent-gold-light);
-        transform: translateY(3px);
-    }
-
-    /* Reverse arrow animation for "Show Less" */
-    .slot-toggle-btn.collapsed svg {
-        transform: rotate(180deg);
-    }
-
-    .slot-toggle-btn.collapsed:hover svg {
-        transform: rotate(180deg) translateY(3px);
-    }
-
-    /* Adjust slot grid for mobile */
-    .slot-grid {
-        grid-template-columns: 1fr !important;
-        gap: 10px;
-    }
-
-    .slot-card {
-        padding: 14px 16px;
-        background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
-        border: 1px solid #2a2a2a;
-    }
-
-    .slot-card.available {
-        border: 1px dashed #3a3a3a;
-    }
-
-    .slot-card.available:hover {
-        border: 1px solid var(--accent-gold);
-        background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
-        box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
-    }
-
-    .slot-card.mine {
-        border: 1px solid var(--accent-gold);
-        background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
-    }
-
-    .slot-time {
-        font-size: 15px;
-        color: #ffffff;
-    }
-
-    .slot-status {
-        font-size: 12px;
-        color: #707070;
-    }
-
-    .slot-card.mine .slot-status {
-        color: var(--accent-gold);
-    }
-}
-
-/* Extra small mobile */
-@media (max-width: 380px) {
-    .slot-toggle-btn {
-        padding: 14px 20px;
-        font-size: 13px;
-        letter-spacing: 0.03em;
-    }
-}
-
-/* Tall screens (412x914) */
-@media (max-width: 450px) and (min-height: 800px) {
-    .slot-toggle-btn {
-        padding: 18px 28px;
-        font-size: 14px;
-        margin-top: 16px;
-    }
-
-    .slot-card {
-        padding: 16px 18px;
-    }
-
-    .slot-time {
-        font-size: 16px;
-    }
-
-    .slot-status {
-        font-size: 13px;
-    }
+  .honey-floating-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
 }
