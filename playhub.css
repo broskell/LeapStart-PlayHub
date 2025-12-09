@@ -2010,3 +2010,124 @@ footer img:hover {
     font-size: 22px;
   }
 }
+
+/* ========================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ======================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .primary-btn:hover,
+  .secondary-btn:hover,
+  .slot-toggle-btn:hover {
+    transform: none;
+  }
+
+  .primary-btn:active,
+  .secondary-btn:active {
+    transform: scale(0.98);
+  }
+
+  .slot-toggle-btn:active {
+    transform: translateY(0);
+    background: linear-gradient(145deg, #1a1a1a, #252525);
+    color: var(--accent-gold-light);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4),
+                0 0 15px rgba(212, 175, 55, 0.1),
+                inset 0 1px 0 rgba(212, 175, 55, 0.1);
+  }
+
+  .slot-card.available:hover {
+    transform: none;
+  }
+
+  .slot-card.available:active {
+    border: 1px solid var(--accent-gold);
+    background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.1);
+  }
+
+  .game-card:hover {
+    transform: none;
+  }
+
+  .game-card:active {
+    border-color: var(--border-light);
+    background: var(--surface);
+  }
+
+  .honey-floating-btn:hover {
+    transform: none;
+  }
+
+  .honey-floating-btn:active {
+    transform: scale(0.95);
+  }
+}
+
+/* ========================================
+   SAFE AREA INSETS (Notched Devices)
+   ======================================== */
+
+@supports (padding-top: env(safe-area-inset-top)) {
+  @media (max-width: 768px) {
+    body {
+      padding-top: calc(14px + env(safe-area-inset-top));
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
+      padding-left: calc(12px + env(safe-area-inset-left));
+      padding-right: calc(12px + env(safe-area-inset-right));
+    }
+
+    .honey-floating-btn {
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      right: calc(16px + env(safe-area-inset-right));
+    }
+
+    .honey-widget {
+      bottom: calc(72px + env(safe-area-inset-bottom));
+      right: calc(12px + env(safe-area-inset-right));
+    }
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .slot-toggle-btn::before {
+    display: none;
+  }
+
+  .honey-floating-btn {
+    animation: none;
+  }
+}
+
+/* ========================================
+   SCROLLBAR STYLING FOR MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+  #my-bookings-list::-webkit-scrollbar,
+  #challenge-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  #my-bookings-list::-webkit-scrollbar-thumb,
+  #challenge-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+  }
+
+  .honey-chat-messages::-webkit-scrollbar {
+    width: 4px;
+  }
+}
