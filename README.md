@@ -1,7 +1,7 @@
 # PlayHub – Campus Game Planner
 
 <div align="center">
-  <img src="assets/playhub_logo.png" alt="PlayHub Logo" width="200"/>
+  <img src="assets/playhub_html_logo.png" alt="PlayHub Logo" width="200"/>
 </div>
 
 PlayHub is a web-based game planner designed for students at LST. It enables students to book slots for foosball, carrom, chess, and UNO, send challenges to other players, and use an AI assistant named "Honey" to book or cancel slots using natural language.
@@ -65,8 +65,6 @@ PlayHub is a web-based game planner designed for students at LST. It enables stu
   <img src="assets/playhub_honey_screenshot.png" alt="Honey AI Assistant" width="800"/>
   <p><em>Natural language booking with Honey, your AI assistant</em></p>
 </div>
-
-*Note: Add your actual screenshots to the `assets/` folder with the names shown above.*
 
 ---
 
@@ -207,7 +205,7 @@ netlify/
 
 #### Configure Environment Variables
 In Netlify dashboard (Site settings → Environment variables):
-- Add `GROQ_API_KEY` with your Groq API key
+- Groq API key
 - Redeploy after saving
 
 #### Honey Function Endpoint
@@ -272,7 +270,10 @@ playhub/
 ├── assets/                    # Images and logos
 │   ├── bgless_sign.png
 │   ├── html_logo.png
+│   ├── playhub_dashboard_screenshot.png
+│   ├── playhub_honey_screenshot.png
 │   ├── playhub_html_logo.png
+│   ├── playhub_login_screenshot.png
 │   └── playhub_logo*.png
 ├── netlify/
 │   └── functions/
