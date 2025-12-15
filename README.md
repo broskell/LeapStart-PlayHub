@@ -62,7 +62,7 @@ PlayHub is a web-based game planner designed for students at LST. It enables stu
 
 ### Honey AI Assistant
 <div align="center">
-  <img src="assets/playhub_honey_screenshot.png" alt="Honey AI Assistant" width="800"/>
+  <img src="assets/playhub_honey_screenshot.png" alt="Honey AI Assistant" width="300"/>
   <p><em>Natural language booking with Honey, your AI assistant</em></p>
 </div>
 
