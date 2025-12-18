@@ -581,7 +581,7 @@ copies of the Software...
 ### Saathvik Kellampalli
 
 [![GitHub](https://img.shields.io/badge/GitHub-@broskell-181717?style=for-the-badge&logo=github)](https://github.com/broskell)
-[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-FF5722?style=for-the-badge&logo=google-chrome&logoColor=white)](https://your-portfolio.com)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-FF5722?style=for-the-badge&logo=google-chrome&logoColor=white)](https://your-portfolio.com](https://saathvikkellampalli.vercel.app/))
 
 **Full Stack Developer | AI Enthusiast | Student at LST**
 
@@ -643,6 +643,6 @@ Made with ❤️ for the LST community
 
 [Website](https://playhub-lst.vercel.app) • [GitHub](https://github.com/broskell/playhub) • [Issues](https://github.com/broskell/playhub/issues)
 
-© 2024 Saathvik Kellampalli. All rights reserved.
+© 2025 Saathvik Kellampalli. All rights reserved.
 
 </div>
