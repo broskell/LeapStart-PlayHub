@@ -1,16 +1,9 @@
-// netlify/functions/honey-assistant.js
-// Honey assistant using Groq API (key from env var GROQ_API_KEY)
+// api/honey-assistant.js
+// Honey assistant using Groq API on Vercel
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "llama-3.1-8b-instant"; // or any Groq chat model you prefer
-
-// CORS headers so browser preflight (OPTIONS) succeeds
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*", // or "https://playhub-lst.netlify.app"
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+const MODEL = "llama-3.1-8b-instant";
 
 // Helper: remove ```json fences if model returns them
 function stripCodeFences(text) {
@@ -21,64 +14,44 @@ function stripCodeFences(text) {
     .trim();
 }
 
-exports.handler = async function (event) {
+export default async function handler(req, res) {
+  // CORS for local dev
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") {
+    return res
+      .status(405)
+      .json({ error: "Method not allowed. Use POST with JSON body." });
+  }
+
+  if (!GROQ_API_KEY) {
+    return res
+      .status(500)
+      .json({ error: "Missing GROQ_API_KEY environment variable" });
+  }
+
+  let body;
   try {
-    console.log("Honey function method:", event.httpMethod);
+    body =
+      typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body;
+  } catch {
+    return res.status(400).json({ error: "Invalid JSON body" });
+  }
 
-    // Handle CORS preflight
-    if (event.httpMethod === "OPTIONS") {
-      return {
-        statusCode: 200,
-        headers: CORS_HEADERS,
-        body: "",
-      };
-    }
+  const { message, today, currentGame, currentDate, displayName, history } =
+    body || {};
 
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Method not allowed" }),
-      };
-    }
+  if (!message) {
+    return res.status(400).json({ error: "Missing message" });
+  }
 
-    if (!GROQ_API_KEY) {
-      return {
-        statusCode: 500,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Missing GROQ_API_KEY env var" }),
-      };
-    }
-
-    let body;
-    try {
-      body = JSON.parse(event.body || "{}");
-    } catch {
-      return {
-        statusCode: 400,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Invalid JSON body" }),
-      };
-    }
-
-    const {
-      message,
-      today,
-      currentGame,
-      currentDate,
-      displayName,
-      history,
-    } = body;
-
-    if (!message) {
-      return {
-        statusCode: 400,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Missing message" }),
-      };
-    }
-
-    const systemPrompt = `
+  const systemPrompt = `
 You are Honey, a female Indian AI assistant inside a campus game booking web app called PlayHub.
 
 Personality:
@@ -132,28 +105,29 @@ Behavior:
 - Keep reply fun but short (1–3 sentences).
 `;
 
-    const messages = [{ role: "system", content: systemPrompt }];
+  const messages = [{ role: "system", content: systemPrompt }];
 
-    // Short history for context
-    if (Array.isArray(history)) {
-      history.forEach((h) => {
-        if (!h || !h.role || !h.content) return;
-        const role = h.role === "assistant" ? "assistant" : "user";
-        messages.push({ role, content: h.content });
-      });
-    }
+  // Short history for context
+  if (Array.isArray(history)) {
+    history.forEach((h) => {
+      if (!h || !h.role || !h.content) return;
+      const role = h.role === "assistant" ? "assistant" : "user";
+      messages.push({ role, content: h.content });
+    });
+  }
 
-    // Provide current context
-    const contextLine = `User name: ${
-      displayName || "Student"
-    }. Current selected game: ${
-      currentGame || "none"
-    }. Current selected date: ${currentDate || "none"}.`;
-    messages.push({ role: "assistant", content: contextLine });
+  // Provide current context
+  const contextLine = `User name: ${
+    displayName || "Student"
+  }. Current selected game: ${
+    currentGame || "none"
+  }. Current selected date: ${currentDate || "none"}.`;
+  messages.push({ role: "assistant", content: contextLine });
 
-    // The actual user message
-    messages.push({ role: "user", content: message });
+  // The actual user message
+  messages.push({ role: "user", content: message });
 
+  try {
     const groqResp = await fetch(GROQ_URL, {
       method: "POST",
       headers: {
@@ -170,11 +144,9 @@ Behavior:
     if (!groqResp.ok) {
       const text = await groqResp.text();
       console.error("Groq error:", text);
-      return {
-        statusCode: 500,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Groq API error", details: text }),
-      };
+      return res
+        .status(500)
+        .json({ error: "Groq API error", details: text });
     }
 
     const data = await groqResp.json();
@@ -189,7 +161,7 @@ Behavior:
       parsed = {
         reply:
           content ||
-          "Arey, my brain glitched for a second. Ask me again a bit more clearly?",
+          "Arre, my brain glitched for a second. Ask me again a bit more clearly?",
         action: "none",
         game: null,
         date: null,
@@ -200,22 +172,14 @@ Behavior:
 
     // Basic defaults
     if (!parsed.reply) {
-      parsed.reply = "Arey, I blanked out for a second. Say it again?";
+      parsed.reply = "Arre, I blanked out for a second. Say it again?";
     }
     if (!parsed.action) parsed.action = "none";
     if (!("suggestions" in parsed)) parsed.suggestions = [];
 
-    return {
-      statusCode: 200,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      body: JSON.stringify(parsed),
-    };
+    return res.status(200).json(parsed);
   } catch (err) {
     console.error("Honey assistant function error:", err);
-    return {
-      statusCode: 500,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Server error" }),
-    };
+    return res.status(500).json({ error: "Server error" });
   }
-};
+}

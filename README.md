@@ -6,7 +6,7 @@
 
 PlayHub is a web-based game planner designed for students at LST. It enables students to book slots for foosball, carrom, chess, and UNO, send challenges to other players, and use an AI assistant named "Honey" to book or cancel slots using natural language.
 
-**🚀 Live Demo:** [https://playhub-lst.netlify.app](https://playhub-lst.netlify.app)
+**🚀 Live Demo:** [https://playhub-lst.vercel.app](https://playhub-lst.vercel.app)
 
 ---
 
@@ -88,8 +88,8 @@ PlayHub is a web-based game planner designed for students at LST. It enables stu
   - `bookings` – Game bookings (one document per game/date/slot)
   - `challenges` – Challenge records between players
 - **Firebase Authentication** – User login and profile management
-- **Netlify Functions** (Serverless)
-  - `netlify/functions/honey-assistant.js` – AI assistant endpoint
+- **Vercel Functions** (Serverless)
+  - `vercel/functions/honey-assistant.js` – AI assistant endpoint
     - Receives chat context from frontend
     - Calls Groq's chat completions API
     - Returns structured JSON with actions and suggestions
@@ -132,8 +132,8 @@ PlayHub is a web-based game planner designed for students at LST. It enables stu
 | **Frontend** | HTML5, CSS3, JavaScript (ES6+) |
 | **Authentication** | Firebase Authentication |
 | **Database** | Firebase Firestore |
-| **Hosting** | Netlify |
-| **Serverless** | Netlify Functions |
+| **Hosting** | Vercel |
+| **Serverless** | Vercel Functions |
 | **AI/LLM** | Groq API |
 | **Design** | Responsive CSS, Custom UI components |
 
@@ -144,7 +144,7 @@ PlayHub is a web-based game planner designed for students at LST. It enables stu
 ### Prerequisites
 - Node.js (v14 or higher)
 - A Firebase account
-- A Netlify account
+- A Vercel account
 - A Groq API key
 
 ### 1️⃣ Clone the Repository
@@ -181,8 +181,8 @@ const db = firebase.firestore();
 
 ### 3️⃣ Netlify + Groq Setup
 
-#### Create Netlify Site
-1. Create a new site on [Netlify](https://app.netlify.com)
+#### Create Vercel Site
+1. Create a new site on [Vercel](https://vercel.com)
 2. Connect to your Git repository or drag-and-drop the project folder
 3. Ensure your project includes:
 
@@ -193,14 +193,14 @@ netlify/
     honey-assistant.js
 ```
 
-4. Create `netlify.toml` in project root:
+4. Create `vercel.toml` in project root:
 
 ```toml
 [build]
   publish = "."
 
 [functions]
-  directory = "netlify/functions"
+  directory = "vercel/functions"
 ```
 
 #### Configure Environment Variables
@@ -209,7 +209,7 @@ In Netlify dashboard (Site settings → Environment variables):
 - Redeploy after saving
 
 #### Honey Function Endpoint
-The function exposes: `/.netlify/functions/honey-assistant`
+The function exposes: `/.vercel/functions/honey-assistant`
 
 **Request format:**
 ```json
@@ -252,14 +252,14 @@ python -m http.server 8000
 
 Open `http://localhost:3000/index.html` (or appropriate port)
 
-**Option B: Netlify Dev (for local functions testing)**
+**Option B: Vercel Dev (for local functions testing)**
 
 ```bash
-npm install -g netlify-cli
+npm install -g vercel-cli
 netlify dev
 ```
 
-Update `getHoneyEndpoint()` in `playhub.js` to point to local dev URL (usually `http://localhost:8888/.netlify/functions/honey-assistant`)
+Update `getHoneyEndpoint()` in `playhub.js` to point to local dev URL (usually `http://localhost:8888/.vercel/functions/honey-assistant`)
 
 ---
 
@@ -275,7 +275,7 @@ playhub/
 │   ├── playhub_html_logo.png
 │   ├── playhub_login_screenshot.png
 │   └── playhub_logo*.png
-├── netlify/
+├── vercel/
 │   └── functions/
 │       └── honey-assistant.js # AI assistant serverless function
 ├── index.html                 # Login/landing page
@@ -286,7 +286,7 @@ playhub/
 ├── playhub.js                # Dashboard logic
 ├── firebase-init.js          # Firebase configuration
 ├── auth.js                   # Authentication logic
-├── netlify.toml              # Netlify configuration
+├── vercel.toml              # Netlify configuration
 └── README.md                 # This file
 ```
 
@@ -315,7 +315,7 @@ playhub/
 ## 🔒 Security Considerations
 
 - Firebase Security Rules should be configured for production
-- Environment variables (API keys) stored securely in Netlify
+- Environment variables (API keys) stored securely in Vercel
 - User authentication required for all booking operations
 - Input validation on both client and server side
 
@@ -384,7 +384,7 @@ LST Undergraduate
 For issues, questions, or suggestions:
 - 🐛 [Open an issue](https://github.com/broskell/playhub/issues)
 - 💬 Contact via GitHub [@broskell](https://github.com/broskell)
-- 🌐 Visit [https://playhub-lst.netlify.app](https://playhub-lst.netlify.app)
+- 🌐 Visit [https://playhub-lst.vercel.app](https://playhub-lst.vercel.app)
 
 ---
 
