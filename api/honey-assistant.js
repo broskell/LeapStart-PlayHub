@@ -172,7 +172,7 @@ Behavior:
 
     // Basic defaults
     if (!parsed.reply) {
-      parsed.reply = "Arre, I blanked out for a second. Say it again?";
+      parsed.reply = "Arey, I blanked out for a second. Say it again?";
     }
     if (!parsed.action) parsed.action = "none";
     if (!("suggestions" in parsed)) parsed.suggestions = [];
