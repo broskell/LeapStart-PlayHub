@@ -17,7 +17,7 @@ const CLASS_BLOCKS = [
 ];
 
 // Netlify site base – used when running locally via file:// or localhost
-const HONEY_NETLIFY_BASE = "https://playhub-lst.netlify.app";
+const HONEY_NETLIFY_BASE = "https://playhub-lst.vercel.app";
 
 // Mobile slot limit config
 const MOBILE_BREAKPOINT = 600;    // pixels
